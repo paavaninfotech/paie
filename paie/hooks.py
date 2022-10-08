@@ -185,3 +185,8 @@ app_license = "MIT"
 # auth_hooks = [
 #	"paie.auth.validate"
 # ]
+
+fixtures = [
+    "Custom Field",
+    # add more here
+]
