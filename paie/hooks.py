@@ -94,9 +94,11 @@ app_license = "MIT"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-#	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+    "Salary Structure Assignment": "paie.override.salary_structure.CustomSalaryStructureAssignment",
+    "Payroll Entry": "paie.override.payroll_entry.CustomPayrollEntry",
+    "Salary Slip": "paie.override.salary_slip.CustomSalarySlip"
+ }
 
 # Document Events
 # ---------------
@@ -188,5 +190,7 @@ app_license = "MIT"
 
 fixtures = [
     "Custom Field",
-    # add more here
+    "Client Script",
+    #"Server Script",
+    {"dt": "Server Script", "filters": [["disabled", "=", 0]]},
 ]

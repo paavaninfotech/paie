@@ -1,0 +1,61 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-10-14 09:59:01.123215",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee_name",
+  "present_days",
+  "sunday_hours",
+  "hours_30",
+  "hours_60",
+  "night_hours"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Link",
+   "label": "Employee Name",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "present_days",
+   "fieldtype": "Data",
+   "label": "Present Days"
+  },
+  {
+   "fieldname": "sunday_hours",
+   "fieldtype": "Data",
+   "label": "Sunday Hours"
+  },
+  {
+   "fieldname": "hours_30",
+   "fieldtype": "Data",
+   "label": "Hours 30"
+  },
+  {
+   "fieldname": "hours_60",
+   "fieldtype": "Data",
+   "label": "Hours 60"
+  },
+  {
+   "fieldname": "night_hours",
+   "fieldtype": "Data",
+   "label": "Night Hours"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-10-19 14:52:20.157316",
+ "modified_by": "Administrator",
+ "module": "Paie Congo",
+ "name": "Attendance Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
