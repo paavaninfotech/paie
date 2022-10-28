@@ -81,11 +81,11 @@ class EmployeeloanApplication(Document):
 					"company": self.company,
 					"posting_date": self.posting_date,
 					"loan_type": self.loan_type,
-					"loan_amount": self.loan_amount,
+					"loan_amount_in_loan_currency": self.loan_amount,
 					"rate_of_interest": 0,
 					"exchange_rate": self.exchange_rate, 
 					"currency": self.currency, 
-					"repay_from_salary": 1,
+					"repay_from_salary_slip": 1,
 					"repayment_method": self.repayment_method,
 					"repayment_periods": self.number_of_installments,
 					"repayment_start_date": self.loan_start_date,
@@ -155,9 +155,9 @@ def create_loan_for_employees(employees, args, is_quinzaine, publish_progress=Tr
 
 		for emp in employees:
 			if is_quinzaine == 0 :
-				args.update({"doctype": "Loan", "applicant": emp.employee, "monthly_repayment_amount": emp.loan_amount,})
+				args.update({"doctype": "Loan", "applicant": emp.employee, "monthly_repayment_amount_in_loan_currency": emp.loan_amount,})
 			else :
-				args.update({"doctype": "Loan", "applicant": emp.employee, "monthly_repayment_amount": emp.loan_amount,"loan_amount": emp.loan_amount,})
+				args.update({"doctype": "Loan", "applicant": emp.employee, "monthly_repayment_amount_in_loan_currency": emp.loan_amount,"loan_amount_in_loan_currency": emp.loan_amount,})
 			loan_doc = frappe.get_doc(args)
 			loan_doc.insert()
 			loan_doc.submit()

@@ -30,18 +30,20 @@
    "fieldname": "basic_salary",
    "fieldtype": "Currency",
    "label": "Basic Salary",
+   "options": "currency",
    "read_only": 1
   },
   {
    "fieldname": "loan_amount",
    "fieldtype": "Currency",
-   "label": "Loan Amount"
+   "label": "Loan Amount",
+   "options": "currency"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-10-20 15:32:45.713709",
+ "modified": "2022-10-28 10:53:00.997161",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Loan Employee details",

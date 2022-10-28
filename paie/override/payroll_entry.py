@@ -93,7 +93,7 @@ class CustomPayrollEntry(PayrollEntry):
                 for t in salary_types:
                     #frappe.msgprint(str( not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type})))
                     if not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type}):
-                        args.update({"doctype": "Salary Slip", "employee": emp, "salary_type": t.salary_type, "salary_structure": t.salary_structure})
+                        args.update({"doctype": "Salary Slip", "employee": emp, "salary_type": t.salary_type, "salary_structure": t.salary_structure, "is_main_salary": t.is_main_salary})
                         frappe.get_doc(args).insert()
                         
                         #frappe.msgprint(str(args))
@@ -146,7 +146,7 @@ class CustomPayrollEntry(PayrollEntry):
                     "payroll_entry": self.name,
                     "exchange_rate": self.exchange_rate,
                     "currency": self.currency,
-                    "eventual": self.eventual,
+                    "eventual": self.eventual
                 }
             )
             if len(employees) > 30 or frappe.flags.enqueue_payroll_entry:

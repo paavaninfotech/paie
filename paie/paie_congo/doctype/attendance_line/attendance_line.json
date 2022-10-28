@@ -1,13 +1,14 @@
 {
  "actions": [],
- "allow_rename": 1,
- "creation": "2022-10-14 09:59:01.123215",
+ "autoname": "autoincrement",
+ "creation": "2022-10-26 16:41:33.501897",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "employee",
   "employee_name",
-  "present_days",
+  "absence",
   "sunday_hours",
   "hours_30",
   "hours_60",
@@ -15,44 +16,52 @@
  ],
  "fields": [
   {
-   "fieldname": "employee_name",
+   "fieldname": "employee",
    "fieldtype": "Link",
-   "label": "Employee Name",
+   "label": "Employee",
    "options": "Employee"
   },
   {
-   "fieldname": "present_days",
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
    "fieldtype": "Data",
-   "label": "Present Days"
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "absence",
+   "fieldtype": "Float",
+   "label": "Absence"
   },
   {
    "fieldname": "sunday_hours",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "label": "Sunday Hours"
   },
   {
    "fieldname": "hours_30",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "label": "Hours 30"
   },
   {
    "fieldname": "hours_60",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "label": "Hours 60"
   },
   {
    "fieldname": "night_hours",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "label": "Night Hours"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-10-19 14:52:20.157316",
+ "modified": "2022-10-26 16:49:48.523901",
  "modified_by": "Administrator",
  "module": "Paie Congo",
- "name": "Attendance Details",
+ "name": "Attendance Line",
+ "naming_rule": "Autoincrement",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",

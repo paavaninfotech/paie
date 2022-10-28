@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:pay_period",
  "creation": "2022-10-14 09:55:27.877632",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -12,14 +13,15 @@
   "end_date",
   "data_5",
   "amended_from",
-  "attendance_details"
+  "attendance_line"
  ],
  "fields": [
   {
    "fieldname": "pay_period",
    "fieldtype": "Link",
    "label": "Pay Period",
-   "options": "Payroll Period"
+   "options": "Payroll Period",
+   "unique": 1
   },
   {
    "fieldname": "column_break_2",
@@ -53,19 +55,20 @@
    "read_only": 1
   },
   {
-   "fieldname": "attendance_details",
+   "fieldname": "attendance_line",
    "fieldtype": "Table",
-   "label": "Attendance Details",
-   "options": "Attendance Details"
+   "label": "Attendance Line",
+   "options": "Attendance Line"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-10-19 14:52:10.411034",
+ "modified": "2022-10-26 16:42:19.561276",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Attendance list",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

@@ -4,5 +4,5 @@
 # import frappe
 from frappe.model.document import Document
 
-class AttendanceDetails(Document):
+class AttendanceLine(Document):
 	pass

@@ -97,20 +97,21 @@ app_license = "MIT"
 override_doctype_class = {
     "Salary Structure Assignment": "paie.override.salary_structure.CustomSalaryStructureAssignment",
     "Payroll Entry": "paie.override.payroll_entry.CustomPayrollEntry",
-    "Salary Slip": "paie.override.salary_slip.CustomSalarySlip"
+    "Salary Slip": "paie.override.salary_slip.CustomSalarySlip",
+    "Loan": "paie.override.loan.CustomLoan",
  }
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-#	"*": {
+#doc_events = {
+#   "Loan": {"validate": "paie.override.utils.validate_loan_repay_from_salary"},
 #		"on_update": "method",
 #		"on_cancel": "method",
 #		"on_trash": "method"
 #	}
-# }
+#}
 
 # Scheduled Tasks
 # ---------------
