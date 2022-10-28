@@ -28,20 +28,5 @@
   "reference_doctype": "Item",
   "script": "employees = frappe.db.get_list(doctype = \"Employee\", \n    fields = [\"name\",\"date_of_joining\",\"anciennete\",\"basic_salary_per_day\"], \n    filters = {\"Status\" : \"Active\"}\n)\nfor e in employees : \n    date_join = frappe.utils.getdate(e.date_of_joining) \n    year_join = int(str(date_join)[:4])\n    today = frappe.utils.getdate()\n    year_today = int(frappe.utils.get_date_str(today)[:4])\n    if year_today > year_join :\n        mois_join = str(date_join)[5:7]\n        mois_today = frappe.utils.get_date_str(today)[5:7]\n        if mois_join == mois_today : # todo utiliser date between plutot\n            employee = frappe.get_doc(\"Employee\", e.name)\n            anciennete_rate = frappe.db.get_single_value(\"Custom Paie Settings\", \"anciennete_rate\")\n            diff = year_today - year_join\n            employee.anciennete = employee.anciennete + employee.basic_salary_per_day * anciennete_rate / 100\n            employee.save()\n            #nb_jours = (diff // 5) * 2\n            #frappe.msgprint(str(conge_days_5_years))\n",
   "script_type": "DocType Event"
- },
- {
-  "allow_guest": 0,
-  "api_method": null,
-  "disabled": 0,
-  "docstatus": 0,
-  "doctype": "Server Script",
-  "doctype_event": "After Submit",
-  "event_frequency": "All",
-  "modified": "2022-10-14 10:04:08.177339",
-  "module": null,
-  "name": "Update Employee by Attendance",
-  "reference_doctype": "Attendance list",
-  "script": "employees = doc.attendance_details\n#frappe.msgprint(json.dumps(employees))\nfor e in employees:\n    emp = frappe.get_doc('Employee', e.employee_name)\n    emp.present_days = e.present_days\n    emp.sunday_hours = e.sunday_hours\n    emp.hours_30 = e.hours_30\n    emp.hours_60 = e.hours_60\n    emp.night_hours = e.night_hours\n    emp.save()",
-  "script_type": "DocType Event"
  }
 ]
