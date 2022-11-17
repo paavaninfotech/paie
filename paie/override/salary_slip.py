@@ -1,4 +1,4 @@
-from hrms.payroll.doctype.salary_slip.salary_slip import SalarySlip
+from hrms.payroll.doctype.salary_slip.salary_slip import SalarySlip, get_lwp_or_ppl_for_date
 import frappe
 from frappe import _, msgprint
 from frappe.utils import (
@@ -192,7 +192,7 @@ class CustomSalarySlip(SalarySlip):
 			if hasattr(self, "deductions"):
 				for deduction in self.deductions:
 					self.total_deduction += flt(deduction.amount, deduction.precision("amount"))
-			frappe.msgprint(str(self.total_loan_repayment_foreign_currency))
+			#frappe.msgprint(str(self.total_loan_repayment_foreign_currency))
 			self.net_pay = flt(self.gross_pay) - flt(self.total_deduction) - flt(self.total_loan_repayment_foreign_currency)
 		self.set_base_totals()
 
@@ -212,3 +212,35 @@ class CustomSalarySlip(SalarySlip):
 				flt(self.hour_rate) * flt(self.exchange_rate), self.precision("base_hour_rate")
 			)
 		self.set_net_total_in_words()
+
+	def calculate_lwp_or_ppl_based_on_leave_application(self, holidays, working_days):
+		lwp = 0
+		holidays = "','".join(holidays)
+		feries = holidays.split(',')
+		nb = len(feries)
+		daily_wages_fraction_for_half_day = (
+			flt(frappe.db.get_value("Payroll Settings", None, "daily_wages_fraction_for_half_day")) or 0.5
+		)
+
+		#frappe.msgprint(str(len(feries)))
+		for d in range(working_days + nb):
+			date = add_days(cstr(getdate(self.start_date)), d)
+			leave = get_lwp_or_ppl_for_date(date, self.employee, holidays)
+			#frappe.msgprint(str(d) + " | " + str(date))
+			if leave:
+				equivalent_lwp_count = 0
+				is_half_day_leave = cint(leave[0].is_half_day)
+				is_partially_paid_leave = cint(leave[0].is_ppl)
+				fraction_of_daily_salary_per_leave = flt(leave[0].fraction_of_daily_salary_per_leave)
+
+				equivalent_lwp_count = (1 - daily_wages_fraction_for_half_day) if is_half_day_leave else 1
+
+				if is_partially_paid_leave:
+					equivalent_lwp_count *= (
+						fraction_of_daily_salary_per_leave if fraction_of_daily_salary_per_leave else 1
+					)
+
+				lwp += equivalent_lwp_count
+				#frappe.msgprint(str(lwp))
+		return lwp
+

@@ -1,0 +1,44 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2022-11-10 09:30:07.653065",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "type",
+  "nom_complet",
+  "date_naissance"
+ ],
+ "fields": [
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Epouse\nEnfant\nEmployee"
+  },
+  {
+   "fieldname": "nom_complet",
+   "fieldtype": "Data",
+   "label": "Nom Complet"
+  },
+  {
+   "fieldname": "date_naissance",
+   "fieldtype": "Date",
+   "label": "Date Naissance"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-11-16 10:25:13.848063",
+ "modified_by": "Administrator",
+ "module": "Paie Congo",
+ "name": "Dependant",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

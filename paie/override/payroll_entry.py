@@ -29,6 +29,7 @@ from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
 from erpnext.accounts.utils import get_fiscal_year
 from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee
 from hrms.hr.utils import get_holiday_dates_for_employee
+from paie.override.journal_entry import CustomJournalEntry
 
 class CustomPayrollEntry(PayrollEntry):
 
@@ -40,6 +41,20 @@ class CustomPayrollEntry(PayrollEntry):
                         ['status', 'IN', ['Absent', 'On Leave']]
                     ])
         return attendance - len(holiday)
+
+    def calcul_conge_annuel(self,emp, from_date, to_date):
+        conge = frappe.db.sql_list(
+            """
+            SELECT a.total_leave_days
+            FROM `tabLeave Application` a INNER JOIN `tabLeave Type` t ON a.leave_type = t.name
+            WHERE a.employee = %s AND a.from_date BETWEEN %s AND %s AND a.status = 'Approved' AND is_circumstance = 0
+            LIMIT 1
+            """ , (emp, from_date, to_date),
+        )
+        #frappe.msgprint(str(conge or 0))
+        if len(conge) == 0 :
+            return 0
+        return conge[0]
 
     def get_existing_salary_slips(self,employees, args):
         return frappe.db.sql_list(
@@ -65,14 +80,11 @@ class CustomPayrollEntry(PayrollEntry):
             
             
             for emp in employees:
-                leaves = frappe.db.count('Attendance', filters=[
-                        ['employee', '=', emp],
-                        ['attendance_date', 'between', [self.start_date, self.end_date]],
-                        ['status', 'IN', ['On Leave']]
-                    ])
+                leaves = self.calcul_conge_annuel(emp, self.start_date, self.end_date)
                 employee = frappe.get_doc('Employee', emp)
-                employee.absence = self.calcul_absence(emp)
-                employee.conge_period = leaves
+                #employee.absence = self.calcul_absence(emp)
+                employee.jour_conge = leaves
+                #employee.conge_period = leaves
                 employee.save()
 
                 salary_types = frappe.db.get_list(doctype="Salary Structure Assignment", fields=["salary_type", "salary_structure"], 
@@ -93,7 +105,22 @@ class CustomPayrollEntry(PayrollEntry):
                 for t in salary_types:
                     #frappe.msgprint(str( not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type})))
                     if not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type}):
-                        args.update({"doctype": "Salary Slip", "employee": emp, "salary_type": t.salary_type, "salary_structure": t.salary_structure, "is_main_salary": t.is_main_salary})
+                        args.update({
+                            "doctype": "Salary Slip", 
+                            "employee": emp, 
+                            "salary_type": t.salary_type, 
+                            "salary_structure": t.salary_structure, 
+                            "is_main_salary": t.is_main_salary,
+                            
+                            "present_days": employee.present_days, 
+                            "hours_30": employee.hours_30, 
+                            "night_hours": employee.night_hours, 
+                            "sunday_hours": employee.sunday_hours, 
+                            "hours_60": employee.hours_60,
+                            "absence": employee.absence, 
+                            "child": employee.child, 
+                            "dependent": employee.dependent
+                            })
                         frappe.get_doc(args).insert()
                         
                         #frappe.msgprint(str(args))
@@ -153,10 +180,10 @@ class CustomPayrollEntry(PayrollEntry):
                 self.db_set("status", "Queued")
                 frappe.enqueue(
                     self.create_salary_slips_for_employees,
-                    timeout=600,
+                    timeout=1200,
                     employees=employees,
                     args=args,
-                    publish_progress=False,
+                    publish_progress=True,
                 )
                 frappe.msgprint(
                     _("Salary Slip creation is queued. It may take a few minutes"),
@@ -184,4 +211,118 @@ class CustomPayrollEntry(PayrollEntry):
         )
 
         payroll_entry.db_set({"error_message": error_message, "status": "Failed"})
+
+    def make_accrual_jv_entry(self):
+        self.check_permission("write")
+        earnings = self.get_salary_component_total(component_type="earnings") or {}
+        deductions = self.get_salary_component_total(component_type="deductions") or {}
+        payroll_payable_account = self.payroll_payable_account
+        jv_name = ""
+        precision = frappe.get_precision("Journal Entry Account", "debit_in_account_currency")
+
+        if earnings or deductions:
+            journal_entry = frappe.new_doc("Journal Entry")
+            journal_entry.voucher_type = "Journal Entry"
+            journal_entry.user_remark = _("Accrual Journal Entry for salaries from {0} to {1}").format(
+                self.start_date, self.end_date
+            )
+            journal_entry.company = self.company
+            journal_entry.posting_date = self.posting_date
+            accounting_dimensions = get_accounting_dimensions() or []
+
+            accounts = []
+            currencies = []
+            payable_amount = 0
+            payable_amt2 = 0
+            multi_currency = 0
+            company_currency = erpnext.get_company_currency(self.company)
+
+            # Earnings
+            for acc_cc, amount in earnings.items():
+                exchange_rate, amt = self.get_amount_and_exchange_rate_for_journal_entry(
+                    acc_cc[0], amount, company_currency, currencies
+                )
+                payable_amount += flt(amount, precision)
+                payable_amt2 += flt(amt, precision)
+                accounts.append(
+                    self.update_accounting_dimensions(
+                        {
+                            "account": acc_cc[0],
+                            "debit_in_account_currency": flt(amt, precision),
+                            "exchange_rate": flt(exchange_rate),
+                            "cost_center": acc_cc[1] or self.cost_center,
+                            "project": self.project,
+                        },
+                        accounting_dimensions,
+                    )
+                )
+
+            # Deductions
+            for acc_cc, amount in deductions.items():
+                exchange_rate, amt = self.get_amount_and_exchange_rate_for_journal_entry(
+                    acc_cc[0], amount, company_currency, currencies
+                )
+                payable_amount -= flt(amount, precision)
+                payable_amt2 -= flt(amt, precision)
+                accounts.append(
+                    self.update_accounting_dimensions(
+                        {
+                            "account": acc_cc[0],
+                            "credit_in_account_currency": flt(amt, precision),
+                            "exchange_rate": flt(exchange_rate),
+                            "cost_center": acc_cc[1] or self.cost_center,
+                            "project": self.project,
+                        },
+                        accounting_dimensions,
+                    )
+                )
+
+            # Payable amount
+            exchange_rate, payable_amt = self.get_amount_and_exchange_rate_for_journal_entry(
+                payroll_payable_account, payable_amount, company_currency, currencies
+            )
+            accounts.append(
+                self.update_accounting_dimensions(
+                    {
+                        "account": payroll_payable_account,
+                        "credit_in_account_currency": flt(payable_amt, precision),
+                        "exchange_rate": flt(exchange_rate),
+                        "cost_center": self.cost_center,
+                    },
+                    accounting_dimensions,
+                )
+            )
+            if flt(payable_amt2 - payable_amt, precision) != 0 :
+                #frappe.msgprint(str(payable_amt - payable_amt2))
+                accounts.append(
+                    self.update_accounting_dimensions(
+                        {
+                            "account": "67600200 - Round Off - MCO",
+                            "credit_in_account_currency": flt(payable_amt2 - payable_amt, precision),
+                            "exchange_rate": flt(exchange_rate),
+                            "cost_center": self.cost_center,
+                        },
+                        accounting_dimensions,
+                    )
+                )
+            frappe.msgprint(str(payroll_payable_account))
+
+
+            journal_entry.set("accounts", accounts)
+            if len(currencies) > 1:
+                multi_currency = 1
+            journal_entry.multi_currency = multi_currency
+            journal_entry.title = payroll_payable_account
+            journal_entry.save()
+
+            try:
+                journal_entry.submit()
+                jv_name = journal_entry.name
+                self.update_salary_slip_status(jv_name=jv_name)
+            except Exception as e:
+                if type(e) in (str, list, tuple):
+                    frappe.msgprint(e)
+                raise
+                
+        return jv_name
 

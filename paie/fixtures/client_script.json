@@ -2,6 +2,17 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
+  "dt": "Loan Type",
+  "enabled": 1,
+  "modified": "2022-11-08 16:47:39.027260",
+  "module": null,
+  "name": "Loan Type Filter Override",
+  "script": "frappe.ui.form.on('Loan Type', {\r\n\tonload: function(frm) {\r\n\t\t$.each([\"penalty_income_account\", \"interest_income_account\"], function (i, field) {\r\n\t\t\tfrm.set_query(field, function () {\r\n\t\t\t\treturn {\r\n\t\t\t\t\t\"filters\": {\r\n\t\t\t\t\t\t\"company\": frm.doc.company,\r\n\t\t\t\t\t\t\"root_type\": \"Income\",\r\n\t\t\t\t\t\t\"is_group\": 0\r\n\t\t\t\t\t}\r\n\t\t\t\t};\r\n\t\t\t});\r\n\t\t});\r\n\r\n\t\t$.each([\"payment_account\", \"loan_account\", \"disbursement_account\"], function (i, field) {\r\n\t\t\tfrm.set_query(field, function () {\r\n\t\t\t\treturn {\r\n\t\t\t\t\t\"filters\": [\r\n                        [\"company\", \"=\", frm.doc.company],\r\n                        [\"root_type\", \"IN\", [\"Asset\", \"Liability\"]],\r\n                        [\"is_group\", \"=\", 0]\r\n                    ]\r\n\t\t\t\t};\r\n\t\t\t});\r\n\t\t});\r\n\t}\r\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
   "dt": "Employee",
   "enabled": 1,
   "modified": "2022-10-13 11:49:18.221149",
@@ -63,6 +74,17 @@
   "module": null,
   "name": "Get Currency for Loan",
   "script": "frappe.ui.form.on('Loan', {\n\tcurrency: function (frm) {\n\t\tvar company_currency;\n\t\tif (!frm.doc.company) {\n\t\t\tcompany_currency = erpnext.get_currency(frappe.defaults.get_default(\"Company\"));\n\t\t} else {\n\t\t\tcompany_currency = erpnext.get_currency(frm.doc.company);\n\t\t}\n\t\tif (frm.doc.currency) {\n\t\t\tif (company_currency != frm.doc.currency) {\n\t\t\t\tfrappe.call({\n\t\t\t\t\tmethod: \"erpnext.setup.utils.get_exchange_rate\",\n\t\t\t\t\targs: {\n\t\t\t\t\t\tfrom_currency: frm.doc.currency,\n\t\t\t\t\t\tto_currency: company_currency,\n\t\t\t\t\t},\n\t\t\t\t\tcallback: function (r) {\n\t\t\t\t\t\tfrm.set_value(\"exchange_rate\", flt(r.message));\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t} else {\n\t\t\t\tfrm.set_value(\"exchange_rate\", 1.0);\n\t\t\t}\n\t\t}\n\t},\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Employee",
+  "enabled": 1,
+  "modified": "2022-11-16 11:03:40.219007",
+  "module": null,
+  "name": "Employee Depedant Management",
+  "script": "frappe.ui.form.on('Employee', {\n    refresh: function(frm) {\n        if(frm.doc.dependant.length <= 0) frm.get_field('dependant').grid.cannot_add_rows = true;\n        else frm.get_field('dependant').grid.cannot_add_rows = false;\n        \n        if(frm.doc.dependant.length > 0){\n\t \t    frm.get_field('dependant').grid.grid_rows[0].docfields[0].read_only = 1;\n\t \t    frm.get_field('dependant').grid.grid_rows[0].docfields[1].read_only = 1;\n\t \t    frm.get_field('dependant').grid.grid_rows[0].docfields[2].read_only = 1;\n\t \t}\n        \n        frm.refresh_field('dependant');\n    },\n\tbefore_save(frm) {\n\t\tif(frm.doc.dependant.length <= 0) frm.events.get_employee_dependant(frm);\n\t},\n\tget_employee_dependant: function (frm) {\n\t\treturn frappe.call({\n\t\t\tmethod: 'paie.override.employee.get_employee_dependant',\n\t\t\targs: { \"emp_name\": frm.doc.name, },\n\t\t    callback: function(r, rt){\n    \t\t\tif (r.message) {\n    \t\t\t    var row = frm.add_child('dependant');\n    \t\t\t\trow.code = r.message.employee,\n\t\t\t\t    row.type = 'Employee',\n\t\t\t\t    row.nom_complet = r.message.employee_name;\n\t\t\t\t    row.date_naissance = r.message.date_of_birth;\n    \t\t\t\tfrm.refresh_field('dependant');\n    \t\t\t\tfrm.dirty();\n    \t\t\t\t//frm.save();\n    \t\t\t\tfrm.refresh();\n    \t\t\t}\n\t\t    }\n\t\t});\n\t},\n});\n\nfrappe.ui.form.on('Dependant', {\n\tbefore_dependant_remove: function(frm, cdt, cdn) {\n\t \tvar row = locals[cdt][cdn];\n\t \tif(row.idx != 1) return;\n\t \tfrappe.throw(__(\"Employee cannot be removed\"));\n\t},\n\ttype: function(frm, cdt, cdn) {\n\t \tvar row = locals[cdt][cdn];\n\t \t\tif(row.idx != 1 && row.type == \"Employee\") {\n\t \t\t    frappe.throw(__(\"Cannot select 'Employee'!!!\"));\n\t \t\t    \n\t \t\t}\n\t},\n});\n\n\n\n",
   "view": "Form"
  }
 ]

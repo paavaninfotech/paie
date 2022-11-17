@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:element_name",
+ "creation": "2022-11-10 10:08:52.997046",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "element_name",
+  "quantite_an",
+  "column_break_3",
+  "is_carry_forward",
+  "allow_negative",
+  "allow_over_allocation"
+ ],
+ "fields": [
+  {
+   "fieldname": "element_name",
+   "fieldtype": "Data",
+   "label": "Element Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "quantite_an",
+   "fieldtype": "Data",
+   "label": "Quantite par An"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_carry_forward",
+   "fieldtype": "Check",
+   "label": "Is Carry Forward"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_negative",
+   "fieldtype": "Check",
+   "label": "Allow Negative Balance"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_over_allocation",
+   "fieldtype": "Check",
+   "label": "Allow Over Allocation"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-11-10 12:48:47.344401",
+ "modified_by": "Administrator",
+ "module": "Paie Congo",
+ "name": "Element de Voyage",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -2,34 +2,84 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 class Attendancelist(Document):
 
-	def on_submit(self):
-		#frappe.msgprint("on submit")
-		lines = self.attendance_line
+	def submit_attendance(self, lines, publish_progress=True) :
+		count = 0
+		frappe.msgprint("OK")
 		for e in lines:
-			#frappe.msgprint(e.employee)
+			frappe.msgprint(e.employee)
 			emp = frappe.get_doc('Employee', e.employee)
 			emp.present_days = 26 - e.absence
+			emp.absence = e.absence
 			emp.sunday_hours = e.sunday_hours
 			emp.hours_30 = e.hours_30
 			emp.hours_60 = e.hours_60
 			emp.night_hours = e.night_hours
 			emp.save()
+
+			count += 1
+			if publish_progress:
+				frappe.publish_progress(
+					count * 100 / len(set(lines)),
+					title=_("Creating Attendance..."),
+				)
+
+	"""
+	def submit(self):
+		if len(self.attendance_line) > 100:
+			self.queue_action('submit')
+		else:
+			self._submit()
+	"""
+
+	def on_submit(self):
+		#frappe.msgprint("on submit")
+		lines = self.attendance_line
+		try:
+			self.check_permission("write")
+			if lines:
+				if len(lines) > 30 or frappe.flags.enqueue_attendance_list:
+					self.db_set("status", "Queued")
+					frappe.enqueue(
+						self.submit_attendance,
+						lines = lines,
+						timeout=600,
+						publish_progress=False,
+					)
+					frappe.msgprint(
+						_("Attendance creation is queued. It may take a few minutes"),
+						alert=True,
+						indicator="blue",
+					)
+				else:
+					self.submit_attendance(lines, publish_progress=False)
+					# since this method is called via frm.call this doc needs to be updated manually
+					self.reload()
+		except Exception as e:
+			frappe.db.rollback()
+			self.log_attendance_failure("submission", attendance_list, e)
+
+		finally:
+			frappe.db.commit()  # nosemgrep
+			frappe.publish_realtime("completed_salary_slip_creation")
     
 
 	@frappe.whitelist()
 	def fill_attendance_line(self):
 		self.set("attendance_line", [])
-		line = get_attendance_list(self.start_date, self.end_date)
+		line = get_attendance_list(self.start_date, self.end_date, self.branch, self.employment_type)
 
 		for d in line:
 			self.append("attendance_line", d)
 
 
-def get_attendance_list(debut, fin):
+def get_attendance_list(debut, fin, branch="", employment_type=""):
+	branch = branch + "%" if not branch is None else "%"
+	employment_type = employment_type + "%" if not employment_type is None else "%"
 	return frappe.db.sql("""
 			SELECT v.employee AS employee, v.real_working_hours/9 AS jour_preste, 26 -  v.real_working_hours/9 AS absence, v.holidays_working AS sunday_hours,
 			CASE WHEN v.avant + v.apres >= 6 THEN 6 ELSE v.avant + v.apres END AS hours_30,
@@ -61,13 +111,31 @@ def get_attendance_list(debut, fin):
 						CASE WHEN IFNULL(a.attendance_date = (SELECT holiday_date FROM tabHoliday h WHERE a.attendance_date = h.holiday_date),0) THEN a.working_hours ELSE 0 END AS holidays, 
 						a.working_hours
 						FROM `tabAttendance` a INNER JOIN `tabShift Type` s ON a.shift = s.name INNER JOIN tabEmployee e ON e.name = a.employee
-						WHERE a.attendance_date BETWEEN %(debut)s AND %(fin)s 
+						WHERE a.attendance_date BETWEEN %(debut)s AND %(fin)s AND e.branch LIKE %(branch)s AND e.employment_type LIKE %(employment_type)s
 					) AS t
 				) AS u
 				GROUP BY  u.employee, u.employee_name
 			) AS v
-		""", {"debut":debut, "fin":fin},
+		""", {"debut":debut, "fin":fin, "branch":branch, "employment_type":employment_type},
 		as_dict =True,
 		
 	)
+
+def log_attendance_failure(process, attendance_list, error):
+	error_log = frappe.log_error(
+		title=_("Attendance {0} failed for List {1}").format(process, attendance_list.name)
+	)
+	message_log = frappe.message_log.pop() if frappe.message_log else str(error)
+
+	try:
+		error_message = json.loads(message_log).get("message")
+	except Exception:
+		error_message = message_log
+
+	error_message += "\n" + _("Check Error Log {0} for more details.").format(
+		get_link_to_form("Error Log", error_log.name)
+	)
+
+	attendance_list.db_set({"error_message": error_message, "status": "Failed"})
+
 

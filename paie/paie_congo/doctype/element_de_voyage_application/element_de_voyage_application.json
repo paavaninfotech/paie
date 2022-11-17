@@ -1,0 +1,116 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2022-11-17 10:08:35.134180",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "employee",
+  "nom_complet",
+  "column_break_5",
+  "company",
+  "date_application",
+  "date_depart",
+  "date_arrivee",
+  "section_break_10",
+  "amended_from",
+  "element_de_voyage_application_details"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Serie",
+   "options": "HR-APP-.YYYY.-",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "nom_complet",
+   "fieldtype": "Data",
+   "label": "Nom Complet",
+   "read_only": 1
+  },
+  {
+   "fieldname": "date_application",
+   "fieldtype": "Date",
+   "label": "Date Application"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Element de Voyage Application",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "element_de_voyage_application_details",
+   "fieldtype": "Table",
+   "label": "Element de Voyage Application Details",
+   "options": "Element de Voyage Application Details"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "date_depart",
+   "fieldtype": "Date",
+   "label": "Date Depart"
+  },
+  {
+   "fieldname": "date_arrivee",
+   "fieldtype": "Date",
+   "label": "Date Arrivee"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2022-11-17 11:15:20.167208",
+ "modified_by": "Administrator",
+ "module": "Paie Congo",
+ "name": "Element de Voyage Application",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

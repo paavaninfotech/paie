@@ -3,6 +3,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.utils import nowdate
 
 class EmployeeloanApplication(Document):
 	
@@ -73,7 +74,11 @@ class EmployeeloanApplication(Document):
 		Creates loan for selected employees if already not created
 		"""
 		self.check_permission("write")
-		employees =  self.employee_details    #[emp.employee for emp in self.employee_details]
+		employees =  self.employee_details
+		#employees =  frappe.as_json(self.employee_details)    #[emp.employee for emp in self.employee_details]
+		#frappe.msgprint("<pre>{}</pre>".format(frappe.as_json(self.employee_details)))
+		#doc1 = frappe.get_doc("Employee loan Application","f961285fed")
+		frappe.msgprint(len(employees))
 		if employees:
 			args = frappe._dict(
 				{
@@ -161,6 +166,7 @@ def create_loan_for_employees(employees, args, is_quinzaine, publish_progress=Tr
 			loan_doc = frappe.get_doc(args)
 			loan_doc.insert()
 			loan_doc.submit()
+			make_loan_disbursement(loan_doc.name, loan_doc.company, loan_doc.applicant_type,loan_doc.applicant,loan_doc.loan_amount)
 
 			count += 1
 			if publish_progress:
@@ -175,4 +181,18 @@ def create_loan_for_employees(employees, args, is_quinzaine, publish_progress=Tr
 	finally:
 		frappe.db.commit()  # nosemgrep
 		frappe.publish_realtime("completed_loan_creation")
+
+
+def make_loan_disbursement(loan, company, applicant_type, applicant, pending_amount):
+	disbursement_entry = frappe.new_doc("Loan Disbursement")
+	disbursement_entry.against_loan = loan
+	disbursement_entry.applicant_type = applicant_type
+	disbursement_entry.applicant = applicant
+	disbursement_entry.company = company
+	disbursement_entry.disbursement_date = nowdate()
+	disbursement_entry.posting_date = nowdate()
+
+	disbursement_entry.disbursed_amount = pending_amount
+	disbursement_entry.insert()
+	disbursement_entry.submit()
 

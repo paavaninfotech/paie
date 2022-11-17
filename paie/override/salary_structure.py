@@ -3,6 +3,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import flt, getdate
+from hrms.payroll.doctype.salary_structure.salary_structure import assign_salary_structure_for_employees
 
 class DuplicateAssignment(frappe.ValidationError):
 	pass
@@ -35,3 +36,48 @@ class CustomSalaryStructureAssignment(SalaryStructureAssignment):
                         self.from_date, relieving_date
                     )
                 )
+
+    @frappe.whitelist()
+    def assign_salary_structure(
+        self,
+        branch=None,
+		employment_type=None,
+        grade=None,
+        department=None,
+        designation=None,
+        employee=None,
+        payroll_payable_account=None,
+        from_date=None,
+        base=None,
+        variable=None,
+        income_tax_slab=None,
+    ):
+        employees = self.get_employees(
+            company=self.company, grade=grade, department=department, designation=designation, name=employee, branch=branch, employment_type=employment_type
+        )
+
+        if employees:
+            if len(employees) > 20:
+                frappe.enqueue(
+                    assign_salary_structure_for_employees,
+                    timeout=600,
+                    employees=employees,
+                    salary_structure=self,
+                    payroll_payable_account=payroll_payable_account,
+                    from_date=from_date,
+                    base=base,
+                    variable=variable,
+                    income_tax_slab=income_tax_slab,
+                )
+            else:
+                assign_salary_structure_for_employees(
+                    employees,
+                    self,
+                    payroll_payable_account=payroll_payable_account,
+                    from_date=from_date,
+                    base=base,
+                    variable=variable,
+                    income_tax_slab=income_tax_slab,
+                )
+        else:
+            frappe.msgprint(_("No Employee Found"))

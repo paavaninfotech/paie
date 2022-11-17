@@ -1,27 +1,29 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:pay_period",
+ "autoname": "ATT.######",
  "creation": "2022-10-14 09:55:27.877632",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "pay_period",
+  "branch",
+  "employment_type",
   "column_break_2",
   "start_date",
   "end_date",
   "data_5",
   "amended_from",
-  "attendance_line"
+  "attendance_line",
+  "status"
  ],
  "fields": [
   {
    "fieldname": "pay_period",
    "fieldtype": "Link",
    "label": "Pay Period",
-   "options": "Payroll Period",
-   "unique": 1
+   "options": "Payroll Period"
   },
   {
    "fieldname": "column_break_2",
@@ -59,16 +61,35 @@
    "fieldtype": "Table",
    "label": "Attendance Line",
    "options": "Attendance Line"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "employment_type",
+   "fieldtype": "Link",
+   "label": "Employment Type",
+   "options": "Employment Type"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Status",
+   "options": "Draft\nSubmitted\nCancelled\nQueued\nFailed"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-10-26 16:42:19.561276",
+ "modified": "2022-11-11 17:06:56.745294",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Attendance list",
- "naming_rule": "By fieldname",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
