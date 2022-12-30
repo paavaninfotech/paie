@@ -1,0 +1,70 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2022-11-24 09:47:51.156614",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "date_of_join",
+  "basic",
+  "current_anciennete",
+  "rate",
+  "new_anciennete"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.date_of_joining",
+   "fieldname": "date_of_join",
+   "fieldtype": "Date",
+   "label": "Date of Join",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.basic_salary_per_day",
+   "fieldname": "basic",
+   "fieldtype": "Float",
+   "label": "Basic",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.anciennete",
+   "fieldname": "current_anciennete",
+   "fieldtype": "Float",
+   "label": "Current Anciennete"
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Float",
+   "label": "Rate",
+   "read_only": 1
+  },
+  {
+   "fieldname": "new_anciennete",
+   "fieldtype": "Float",
+   "label": "New Anciennete",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-11-24 10:15:53.289394",
+ "modified_by": "Administrator",
+ "module": "Paie Congo",
+ "name": "Anciennete Details",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

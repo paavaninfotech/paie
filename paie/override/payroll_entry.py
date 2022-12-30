@@ -101,10 +101,10 @@ class CustomPayrollEntry(PayrollEntry):
                     filters={"eventual": 1, "employee": emp, "docstatus": 1, 'event_name': 'Retraite'})
                     if len(ret_struc) > 0: 
                         salary_types = salary_types + ret_struc
-                
+
                 for t in salary_types:
-                    #frappe.msgprint(str( not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type})))
-                    if not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type}):
+                    #frappe.msgprint(str( not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type, "payroll_period": self.payroll_period})))
+                    if not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type, "payroll_period": self.payroll_period}):
                         args.update({
                             "doctype": "Salary Slip", 
                             "employee": emp, 
