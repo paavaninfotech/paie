@@ -104,6 +104,14 @@ class CustomPayrollEntry(PayrollEntry):
 
                 for t in salary_types:
                     #frappe.msgprint(str( not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type, "payroll_period": self.payroll_period})))
+                    #cat_details = frappe.get_doc("Employee Category Details", employee.employee_category_details)
+                    attendances = frappe.db.sql(
+                        """
+                            SELECT l.*
+                            FROM `tabAttendance list` a INNER JOIN `tabAttendance Line` l ON a.name = l.parent
+                            WHERE a.pay_period = '%s' AND employee = '%s' AND a.docstatus = 1  
+                        """ % (payroll_entry.payroll_period,emp), as_dict = 1
+                    )
                     if not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type, "payroll_period": self.payroll_period}):
                         args.update({
                             "doctype": "Salary Slip", 
@@ -111,16 +119,26 @@ class CustomPayrollEntry(PayrollEntry):
                             "salary_type": t.salary_type, 
                             "salary_structure": t.salary_structure, 
                             "is_main_salary": t.is_main_salary,
+
+                            "employee_category_details": employee.employee_category_details, 
                             
-                            "present_days": employee.present_days, 
-                            "hours_30": employee.hours_30, 
-                            "night_hours": employee.night_hours, 
-                            "sunday_hours": employee.sunday_hours, 
-                            "hours_60": employee.hours_60,
-                            "absence": employee.absence, 
+                            #"present_days": employee.present_days, 
+                            #"hours_30": employee.hours_30, 
+                            #"night_hours": employee.night_hours, 
+                            #"sunday_hours": employee.sunday_hours, 
+                            #"hours_60": employee.hours_60,
+                            #"absence": employee.absence, 
+
+                            "present_days": attendances[0].present_days if len(attendances) > 0 else 26, 
+                            "hours_30": attendances[0].hours_30 if len(attendances) > 0 else 0, 
+                            "night_hours": attendances[0].night_hours if len(attendances) > 0 else 0, 
+                            "sunday_hours": attendances[0].sunday_hours if len(attendances) > 0 else 0, 
+                            "hours_60": attendances[0].hours_60 if len(attendances) > 0 else 0,
+                            "absence": attendances[0].absence if len(attendances) > 0 else 0, 
+
                             "child": employee.child, 
                             "dependent": employee.dependent
-                            })
+                        })
                         frappe.get_doc(args).insert()
                         
                         #frappe.msgprint(str(args))

@@ -9,9 +9,9 @@ class Attendancelist(Document):
 
 	def submit_attendance(self, lines, publish_progress=True) :
 		count = 0
-		frappe.msgprint("OK")
+		#frappe.msgprint("OK")
 		for e in lines:
-			frappe.msgprint(e.employee)
+			#frappe.msgprint(e.employee)
 			emp = frappe.get_doc('Employee', e.employee)
 			emp.present_days = 26 - e.absence
 			emp.absence = e.absence
