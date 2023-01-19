@@ -222,8 +222,8 @@ class CustomSalarySlip(SalarySlip):
 			flt(frappe.db.get_value("Payroll Settings", None, "daily_wages_fraction_for_half_day")) or 0.5
 		)
 
-		#frappe.msgprint(str(len(feries)))
-		for d in range(working_days + nb):
+		#frappe.msgprint(str(working_days))
+		for d in range(len(working_days) + nb):
 			date = add_days(cstr(getdate(self.start_date)), d)
 			leave = get_lwp_or_ppl_for_date(date, self.employee, holidays)
 			#frappe.msgprint(str(d) + " | " + str(date))

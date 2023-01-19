@@ -121,6 +121,7 @@ class CustomPayrollEntry(PayrollEntry):
                             "is_main_salary": t.is_main_salary,
 
                             "employee_category_details": employee.employee_category_details, 
+                            "anciennete": employee.anciennete,
                             
                             #"present_days": employee.present_days, 
                             #"hours_30": employee.hours_30, 
