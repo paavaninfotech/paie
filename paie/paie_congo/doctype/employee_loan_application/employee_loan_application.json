@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:{YYYY}LOAN{MM}####",
+ "autoname": "format:{YYYY}LOAN{MM}{####}",
  "creation": "2022-10-19 11:26:23.108588",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -228,7 +228,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-11-11 14:38:06.087291",
+ "modified": "2023-01-20 20:21:51.334355",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Employee loan Application",
