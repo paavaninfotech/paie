@@ -141,10 +141,11 @@ def get_joining_relieving_condition(start_date, end_date):
 def get_emp_list(cond, basic, loan_amount, is_quinzaine):
 	return frappe.db.sql("""
 			select
-				distinct t1.name as employee, t1.employee_name, t1.basic_salary_per_day * %(basic)s as basic_salary, 
-				CASE WHEN %(is_quinzaine)s = 0 THEN %(loan_amount)s ELSE t1.basic_salary_per_day * %(basic)s END as loan_amount
+				distinct t1.name as employee, t1.employee_name, d.basic_salary_per_day * %(basic)s as basic_salary, 
+				CASE WHEN %(is_quinzaine)s = 0 THEN %(loan_amount)s ELSE d.basic_salary_per_day * %(basic)s END as loan_amount
 			from
 				`tabEmployee` t1 inner join `tabSalary Structure Assignment` t2 on t1.name = t2.employee
+				inner join 	`tabEmployee Category Details` d on t1.employee_category_details = d.name
 			where
 				 t1.status != 'Inactive' and t2.is_main_salary = 1
 			{condition}
