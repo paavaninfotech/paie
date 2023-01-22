@@ -130,7 +130,7 @@ class CustomPayrollEntry(PayrollEntry):
                             #"hours_60": employee.hours_60,
                             #"absence": employee.absence, 
 
-                            "present_days": attendances[0].present_days if len(attendances) > 0 else 26, 
+                            "present_days": (26 - attendances[0].absence) if len(attendances) > 0 else 26, 
                             "hours_30": attendances[0].hours_30 if len(attendances) > 0 else 0, 
                             "night_hours": attendances[0].night_hours if len(attendances) > 0 else 0, 
                             "sunday_hours": attendances[0].sunday_hours if len(attendances) > 0 else 0, 

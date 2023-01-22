@@ -35,6 +35,11 @@ def execute(filters=None):
 			doj_map.get(ss.employee),
 			emp_type_map.get(ss.employee),
 			ss.salary_type,
+			ss.employee_category_details,
+			ss.child,
+			ss.dependent,
+			ss.currency,
+			ss.exchange_rate,
 			ss.branch,
 			ss.department,
 			ss.designation,
@@ -42,7 +47,7 @@ def execute(filters=None):
 			ss.start_date,
 			ss.end_date,
 			ss.leave_without_pay,
-			ss.payment_days,
+			ss.present_days,
 		]
 
 		if ss.branch is not None:
@@ -106,6 +111,11 @@ def get_columns(salary_slips):
 		_("Date of Joining") + "::80",
 		_("Employment Type") + "::80",
 		_("Salary Type") + "::80",
+		_("Employee Category") + "::120",
+		_("Enfant") + "::80",
+		_("Dependent") + "::80",
+		_("Currency") + ":Link/Currency:-1",
+		_("Exchange Rate") + ":Float:80",
 		_("Branch") + ":Link/Branch:-1",
 		_("Department") + ":Link/Department:-1",
 		_("Designation") + ":Link/Designation:120",
@@ -113,7 +123,7 @@ def get_columns(salary_slips):
 		_("Start Date") + "::80",
 		_("End Date") + "::80",
 		_("Leave Without Pay") + ":Float:50",
-		_("Payment Days") + ":Float:120",
+		_("Present Days") + ":Float:120",
 	]
 
 	salary_components = {_("Earning"): [], _("Deduction"): []}
