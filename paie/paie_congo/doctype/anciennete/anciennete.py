@@ -25,12 +25,13 @@ class Anciennete(Document):
 
 		employees = frappe.db.sql(
 		"""
-			SELECT distinct e.employee, e.date_of_joining, e.basic_salary_per_day, e.anciennete
+			SELECT distinct e.employee, e.date_of_joining, c.basic_salary_per_day, e.anciennete
 			FROM `tabEmployee` e CROSS JOIN `tabPayroll Period` p LEFT JOIN (
 				SELECT a.payroll_period, d.employee
 				FROM `tabAnciennete` a INNER JOIN `tabAnciennete Details` d ON a.name =  d.parent
 				WHERE a.payroll_period = %(payroll_period)s
 			) t ON e.employee = t.employee  AND t.payroll_period = p.name
+			INNER JOIN 	`tabEmployee Category Details` c on e.employee_category_details = c.name
 			WHERE e.status = 'Active' AND e.company LIKE %(company)s AND (e.branch LIKE %(branch)s or e.branch IS NULL ) AND p.name = %(payroll_period)s
 			AND DATE_ADD(e.date_of_joining, INTERVAL (YEAR(CURRENT_DATE()) - YEAR(e.date_of_joining)) YEAR) between p.start_date and p.end_date
 			AND t.employee IS NULL
