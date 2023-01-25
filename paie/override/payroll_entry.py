@@ -192,7 +192,8 @@ class CustomPayrollEntry(PayrollEntry):
                     "payroll_entry": self.name,
                     "exchange_rate": self.exchange_rate,
                     "currency": self.currency,
-                    "eventual": self.eventual
+                    "eventual": self.eventual,
+                    "payroll_period": self.payroll_period
                 }
             )
             if len(employees) > 30 or frappe.flags.enqueue_payroll_entry:
