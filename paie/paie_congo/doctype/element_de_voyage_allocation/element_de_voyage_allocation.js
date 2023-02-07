@@ -67,7 +67,7 @@ frappe.ui.form.on("Element de Voyage Allocation","onload", function(frm, cdt, cd
     var df = frappe.meta.get_docfield("Element de Voyage Details","disponible", cur_frm.doc.name);
     df.read_only = 1;
 	df = frappe.meta.get_docfield("Element de Voyage Details","en_cours", cur_frm.doc.name);
-    df.read_only = 1;
+    //df.read_only = 1;
 	df = frappe.meta.get_docfield("Element de Voyage Details","utilise", cur_frm.doc.name);
     df.read_only = 1;
 	//df.hidden = 1;
