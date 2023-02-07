@@ -56,6 +56,17 @@ frappe.ui.form.on('Element de Voyage Allocation', {
     }
 });*/
 
+frappe.ui.form.on('Element de Voyage Details', {
+	
+    en_cours(frm, cdt, cdn) {
+		var row = locals[cdt][cdn]; 
+        if(row.en_cours != null){
+			row.reste = row.disponible + row.en_cours - row.utilise;
+			frm.refresh_field('element_de_voyage_details');
+		}
+    },
+});
+
 frappe.ui.form.on("Element de Voyage Allocation","onload", function(frm, cdt, cdn) { 
 	var df = frappe.meta.get_docfield("Element de Voyage Details","code", cur_frm.doc.name);
     df.read_only = 1;
@@ -66,13 +77,13 @@ frappe.ui.form.on("Element de Voyage Allocation","onload", function(frm, cdt, cd
 
     var df = frappe.meta.get_docfield("Element de Voyage Details","disponible", cur_frm.doc.name);
     df.read_only = 1;
-	df = frappe.meta.get_docfield("Element de Voyage Details","en_cours", cur_frm.doc.name);
+	//df = frappe.meta.get_docfield("Element de Voyage Details","en_cours", cur_frm.doc.name);
     //df.read_only = 1;
 	df = frappe.meta.get_docfield("Element de Voyage Details","utilise", cur_frm.doc.name);
     df.read_only = 1;
 	//df.hidden = 1;
 	df = frappe.meta.get_docfield("Element de Voyage Details","reste", cur_frm.doc.name);
     df.read_only = 1;
-	//df.hidden = 1; 
+	df.hidden = 1; 
 
 });
