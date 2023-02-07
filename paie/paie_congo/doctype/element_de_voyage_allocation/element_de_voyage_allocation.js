@@ -84,6 +84,6 @@ frappe.ui.form.on("Element de Voyage Allocation","onload", function(frm, cdt, cd
 	//df.hidden = 1;
 	df = frappe.meta.get_docfield("Element de Voyage Details","reste", cur_frm.doc.name);
     df.read_only = 1;
-	df.hidden = 1; 
+	//df.hidden = 1; 
 
 });
