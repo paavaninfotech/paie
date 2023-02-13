@@ -35,6 +35,7 @@ class EmployeeloanApplication(Document):
 		filters["branch"] = self.branch
 		filters["department"] = self.department
 		filters["designation"] = self.designation
+		filters["employment_type"] = self.employment_type
 
 		return filters
 	
@@ -78,7 +79,7 @@ class EmployeeloanApplication(Document):
 		#employees =  frappe.as_json(self.employee_details)    #[emp.employee for emp in self.employee_details]
 		#frappe.msgprint("<pre>{}</pre>".format(frappe.as_json(self.employee_details)))
 		#doc1 = frappe.get_doc("Employee loan Application","f961285fed")
-		frappe.msgprint(len(employees))
+		frappe.msgprint(str(len(employees)))
 		if employees:
 			args = frappe._dict(
 				{
@@ -122,7 +123,7 @@ class EmployeeloanApplication(Document):
 
 def get_filter_condition(filters):
 		cond = ""
-		for f in ["company", "branch", "department", "designation"]:
+		for f in ["company", "branch", "department", "designation", "employment_type"]:
 			if filters.get(f):
 				cond += " and t1." + f + " = " + frappe.db.escape(filters.get(f))
 
@@ -160,14 +161,16 @@ def create_loan_for_employees(employees, args, is_quinzaine, publish_progress=Tr
 		count = 0
 
 		for emp in employees:
+			e = frappe.get_doc("Employee",emp.employee)
 			if is_quinzaine == 0 :
-				args.update({"doctype": "Loan", "applicant": emp.employee, "monthly_repayment_amount_in_loan_currency": emp.loan_amount,})
+				args.update({"doctype": "Loan", "applicant": emp.employee, "monthly_repayment_amount_in_loan_currency": emp.loan_amount,"cost_center": e.payroll_cost_center,"branch": e.branch})
 			else :
-				args.update({"doctype": "Loan", "applicant": emp.employee, "monthly_repayment_amount_in_loan_currency": emp.loan_amount,"loan_amount_in_loan_currency": emp.loan_amount,})
+				args.update({"doctype": "Loan", "applicant": emp.employee, "monthly_repayment_amount_in_loan_currency": emp.loan_amount,"loan_amount_in_loan_currency": emp.loan_amount,"cost_center": e.payroll_cost_center,"branch": e.branch})
 			loan_doc = frappe.get_doc(args)
+			frappe.msgprint(str(loan_doc.name))
 			loan_doc.insert()
 			loan_doc.submit()
-			make_loan_disbursement(loan_doc.name, loan_doc.company, loan_doc.applicant_type,loan_doc.applicant,loan_doc.loan_amount)
+			make_loan_disbursement(loan_doc.name, loan_doc.company, loan_doc.applicant_type,loan_doc.applicant,loan_doc.loan_amount, loan_doc.cost_center, loan_doc.branch)
 
 			count += 1
 			if publish_progress:
@@ -177,6 +180,7 @@ def create_loan_for_employees(employees, args, is_quinzaine, publish_progress=Tr
 				)
 
 	except Exception as e:
+		frappe.msgprint(str(e))
 		frappe.db.rollback()
 
 	finally:
@@ -184,7 +188,7 @@ def create_loan_for_employees(employees, args, is_quinzaine, publish_progress=Tr
 		frappe.publish_realtime("completed_loan_creation")
 
 
-def make_loan_disbursement(loan, company, applicant_type, applicant, pending_amount):
+def make_loan_disbursement(loan, company, applicant_type, applicant, pending_amount, cost_center, branch):
 	disbursement_entry = frappe.new_doc("Loan Disbursement")
 	disbursement_entry.against_loan = loan
 	disbursement_entry.applicant_type = applicant_type
@@ -192,8 +196,9 @@ def make_loan_disbursement(loan, company, applicant_type, applicant, pending_amo
 	disbursement_entry.company = company
 	disbursement_entry.disbursement_date = nowdate()
 	disbursement_entry.posting_date = nowdate()
+	disbursement_entry.cost_center = cost_center
+	disbursement_entry.branch = branch
 
 	disbursement_entry.disbursed_amount = pending_amount
 	disbursement_entry.insert()
 	disbursement_entry.submit()
-
