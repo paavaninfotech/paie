@@ -70,7 +70,7 @@
   "doctype": "Client Script",
   "dt": "Loan",
   "enabled": 1,
-  "modified": "2022-10-21 11:33:41.898576",
+  "modified": "2023-02-13 10:26:05.972533",
   "module": null,
   "name": "Get Currency for Loan",
   "script": "frappe.ui.form.on('Loan', {\n\tcurrency: function (frm) {\n\t\tvar company_currency;\n\t\tif (!frm.doc.company) {\n\t\t\tcompany_currency = erpnext.get_currency(frappe.defaults.get_default(\"Company\"));\n\t\t} else {\n\t\t\tcompany_currency = erpnext.get_currency(frm.doc.company);\n\t\t}\n\t\tif (frm.doc.currency) {\n\t\t\tif (company_currency != frm.doc.currency) {\n\t\t\t\tfrappe.call({\n\t\t\t\t\tmethod: \"erpnext.setup.utils.get_exchange_rate\",\n\t\t\t\t\targs: {\n\t\t\t\t\t\tfrom_currency: frm.doc.currency,\n\t\t\t\t\t\tto_currency: company_currency,\n\t\t\t\t\t},\n\t\t\t\t\tcallback: function (r) {\n\t\t\t\t\t\tfrm.set_value(\"exchange_rate\", flt(r.message));\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t} else {\n\t\t\t\tfrm.set_value(\"exchange_rate\", 1.0);\n\t\t\t}\n\t\t}\n\t},\n});",

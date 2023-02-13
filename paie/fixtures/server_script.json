@@ -66,21 +66,6 @@
   "docstatus": 0,
   "doctype": "Server Script",
   "doctype_event": "Before Save",
-  "event_frequency": "Daily",
-  "modified": "2022-11-09 08:57:57.175740",
-  "module": null,
-  "name": "Last Attendance Sync Update",
-  "reference_doctype": "Item",
-  "script": "s = frappe.get_doc('Shift Type','Morning')\ns.last_sync_of_checkin =  frappe.utils.add_to_date(frappe.utils.today(), days=-1, as_string=True) + ' 23:59:59'\ns.save()\n\ns = frappe.get_doc('Shift Type','Night')\ns.last_sync_of_checkin =  frappe.utils.add_to_date(frappe.utils.today(), days=-3, as_string=True) + ' 23:59:59'\ns.save()\n",
-  "script_type": "Scheduler Event"
- },
- {
-  "allow_guest": 0,
-  "api_method": null,
-  "disabled": 0,
-  "docstatus": 0,
-  "doctype": "Server Script",
-  "doctype_event": "Before Save",
   "event_frequency": "All",
   "modified": "2022-06-16 23:42:48.442922",
   "module": null,
@@ -118,5 +103,20 @@
   "reference_doctype": null,
   "script": "doc = frappe.get_doc('Employee','EMP0004')\n\nfrappe.response['message'] = doc",
   "script_type": "API"
+ },
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "event_frequency": "Daily",
+  "modified": "2022-11-09 08:57:57.175740",
+  "module": null,
+  "name": "Last Attendance Sync Update",
+  "reference_doctype": "Item",
+  "script": "s = frappe.get_doc('Shift Type','Morning')\ns.last_sync_of_checkin =  frappe.utils.add_to_date(frappe.utils.today(), days=-1, as_string=True) + ' 23:59:59'\ns.save()\n\ns = frappe.get_doc('Shift Type','Night')\ns.last_sync_of_checkin =  frappe.utils.add_to_date(frappe.utils.today(), days=-3, as_string=True) + ' 23:59:59'\ns.save()\n",
+  "script_type": "Scheduler Event"
  }
 ]
