@@ -61,12 +61,12 @@ class CustomPayrollEntry(PayrollEntry):
             """
             select distinct employee, salary_type 
             from `tabSalary Slip`
-            where docstatus!= 2 and company = %s and payroll_entry = %s
+            where docstatus!= 2 and company = %s
                 and start_date >= %s and end_date <= %s
                 and employee in (%s)
         """
-            % ("%s", "%s", "%s", "%s", ", ".join(["%s"] * len(employees))),
-            [args.company, args.payroll_entry, args.start_date, args.end_date] + employees,
+            % ("%s", "%s", "%s", ", ".join(["%s"] * len(employees))),
+            [args.company, args.start_date, args.end_date] + employees,
         )
 
 

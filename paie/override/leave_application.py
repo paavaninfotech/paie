@@ -41,3 +41,12 @@ class CustomLeaveApplication(LeaveApplication):
         if frappe.db.get_value("Leave Type", self.leave_type, "is_optional_leave"):
             self.validate_optional_leave()
         self.validate_applicable_after()
+
+
+@frappe.whitelist()
+def get_all_leave_details():
+    all_leaves = frappe.db.get_list("Leave Type", fields = ["name"])
+
+    return {
+        "all_leaves": all_leaves,
+    }
