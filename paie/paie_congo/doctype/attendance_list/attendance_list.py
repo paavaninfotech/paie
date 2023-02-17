@@ -36,36 +36,36 @@ class Attendancelist(Document):
 			self._submit()
 	"""
 
-	def on_submit(self):
+	#def on_submit(self):
 		#frappe.msgprint("on submit")
-		lines = self.attendance_line
-		try:
-			self.check_permission("write")
-			if lines:
-				if len(lines) > 30 or frappe.flags.enqueue_attendance_list:
-					self.db_set("status", "Queued")
-					frappe.enqueue(
-						self.submit_attendance,
-						lines = lines,
-						timeout=600,
-						publish_progress=False,
-					)
-					frappe.msgprint(
-						_("Attendance creation is queued. It may take a few minutes"),
-						alert=True,
-						indicator="blue",
-					)
-				else:
-					self.submit_attendance(lines, publish_progress=False)
-					# since this method is called via frm.call this doc needs to be updated manually
-					self.reload()
-		except Exception as e:
-			frappe.db.rollback()
-			self.log_attendance_failure("submission", attendance_list, e)
+	#	lines = self.attendance_line
+	#	try:
+	#		self.check_permission("write")
+	#		if lines:
+	#			if len(lines) > 30 or frappe.flags.enqueue_attendance_list:
+	#				self.db_set("status", "Queued")
+	#				frappe.enqueue(
+	#					self.submit_attendance,
+	#					lines = lines,
+	#					timeout=600,
+	#					publish_progress=False,
+	#				)
+	#				frappe.msgprint(
+	#					_("Attendance creation is queued. It may take a few minutes"),
+	#					alert=True,
+	#					indicator="blue",
+	#				)
+	#			else:
+	#				self.submit_attendance(lines, publish_progress=False)
+	#				# since this method is called via frm.call this doc needs to be updated manually
+	#				self.reload()
+	#	except Exception as e:
+	#		frappe.db.rollback()
+	#		self.log_attendance_failure("submission", attendance_list, e)
 
-		finally:
-			frappe.db.commit()  # nosemgrep
-			frappe.publish_realtime("completed_salary_slip_creation")
+	#	finally:
+	#		frappe.db.commit()  # nosemgrep
+	#		frappe.publish_realtime("completed_salary_slip_creation")
     
 
 	@frappe.whitelist()
