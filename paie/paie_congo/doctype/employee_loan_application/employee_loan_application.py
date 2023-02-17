@@ -79,7 +79,7 @@ class EmployeeloanApplication(Document):
 		#employees =  frappe.as_json(self.employee_details)    #[emp.employee for emp in self.employee_details]
 		#frappe.msgprint("<pre>{}</pre>".format(frappe.as_json(self.employee_details)))
 		#doc1 = frappe.get_doc("Employee loan Application","f961285fed")
-		frappe.msgprint(str(len(employees)))
+		#frappe.msgprint(str(len(employees)))
 		if employees:
 			args = frappe._dict(
 				{
@@ -167,7 +167,7 @@ def create_loan_for_employees(employees, args, is_quinzaine, publish_progress=Tr
 			else :
 				args.update({"doctype": "Loan", "applicant": emp.employee, "monthly_repayment_amount_in_loan_currency": emp.loan_amount,"loan_amount_in_loan_currency": emp.loan_amount,"cost_center": e.payroll_cost_center,"branch": e.branch})
 			loan_doc = frappe.get_doc(args)
-			frappe.msgprint(str(loan_doc.name))
+			#frappe.msgprint(str(loan_doc.name))
 			loan_doc.insert()
 			loan_doc.submit()
 			make_loan_disbursement(loan_doc.name, loan_doc.company, loan_doc.applicant_type,loan_doc.applicant,loan_doc.loan_amount, loan_doc.cost_center, loan_doc.branch)
