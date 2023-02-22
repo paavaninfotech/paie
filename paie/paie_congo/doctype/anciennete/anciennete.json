@@ -10,6 +10,7 @@
   "company",
   "branch",
   "posting_date",
+  "employment_type",
   "column_break_4",
   "payroll_period",
   "start_date",
@@ -78,12 +79,18 @@
    "fieldtype": "Table",
    "label": "Anciennete Details",
    "options": "Anciennete Details"
+  },
+  {
+   "fieldname": "employment_type",
+   "fieldtype": "Link",
+   "label": "Employment Type",
+   "options": "Employment Type"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-11-24 10:14:08.222053",
+ "modified": "2023-02-22 16:49:40.756173",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Anciennete",

@@ -34,14 +34,14 @@ class Anciennete(Document):
 			INNER JOIN 	`tabEmployee Category Details` c on e.employee_category_details = c.name
 			WHERE e.status = 'Active' AND e.company LIKE %(company)s AND (e.branch LIKE %(branch)s or e.branch IS NULL ) AND p.name = %(payroll_period)s
 			AND DATE_ADD(e.date_of_joining, INTERVAL (YEAR(CURRENT_DATE()) - YEAR(e.date_of_joining)) YEAR) between p.start_date and p.end_date
-			AND t.employee IS NULL
-		""",{"company":company, "branch":branch, 'payroll_period': self.payroll_period},
+			AND t.employee IS NULL AND (e.employment_type LIKE %(employment_type)s) AND YEAR(e.date_of_joining) < YEAR(CURRENT_DATE())
+		""",{"company":company, "branch":branch, 'payroll_period': self.payroll_period, 'employment_type': self.employment_type},
 		as_dict =True,
 		)
 
 		rate = frappe.db.get_single_value('Custom Paie Settings', 'anciennete_rate')
 
-
+		self.anciennete_details.clear()
 		for e in employees :
 			anciennete = e.anciennete if e.anciennete else 0.0
 			rate = rate if rate else 0.0
