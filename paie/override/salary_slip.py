@@ -20,6 +20,9 @@ from erpnext.loan_management.doctype.loan_repayment.loan_repayment import (
 	calculate_amounts,
 	create_repayment_entry,
 )
+from paie.override.loan_repayment import (
+	create_repayment_entry2,
+)
 
 class CustomSalarySlip(SalarySlip):
 
@@ -243,4 +246,45 @@ class CustomSalarySlip(SalarySlip):
 				lwp += equivalent_lwp_count
 				#frappe.msgprint(str(lwp))
 		return lwp
+
+	def make_loan_repayment_entry(self):
+		payroll_payable_account = get_payroll_payable_account(self.company, self.payroll_entry)
+		for loan in self.loans:
+			if loan.total_payment:
+				emp = frappe.get_doc("Employee",self.employee)
+				repayment_entry = create_repayment_entry2(
+					loan.loan,
+					self.employee,
+					self.company,
+					self.posting_date,
+					loan.loan_type,
+					"Regular Payment",
+					loan.interest_amount,
+					loan.principal_amount,
+					loan.total_payment,
+					emp.payroll_cost_center,
+					emp.branch,
+					payroll_payable_account=payroll_payable_account,
+				)
+
+				repayment_entry.save()
+				repayment_entry.submit()
+
+				frappe.db.set_value(
+					"Salary Slip Loan", loan.name, "loan_repayment_entry", repayment_entry.name
+				)
+
+
+def get_payroll_payable_account(company, payroll_entry):
+	if payroll_entry:
+		payroll_payable_account = frappe.db.get_value(
+			"Payroll Entry", payroll_entry, "payroll_payable_account"
+		)
+	else:
+		payroll_payable_account = frappe.db.get_value(
+			"Company", company, "default_payroll_payable_account"
+		)
+
+	return payroll_payable_account
+
 

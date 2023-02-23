@@ -99,6 +99,7 @@ override_doctype_class = {
     "Payroll Entry": "paie.override.payroll_entry.CustomPayrollEntry",
     "Salary Slip": "paie.override.salary_slip.CustomSalarySlip",
     "Loan": "paie.override.loan.CustomLoan",
+    "Loan Repayment": "paie.override.loan_repayment.CustomLoanRepayment",
     "Journal Entry": "paie.override.journal_entry.CustomJournalEntry",
     "Leave Application": "paie.override.leave_application.CustomLeaveApplication",
     "Leave Allocation": "paie.override.leave_allocation.CustomLeaveAllocation",
