@@ -17,7 +17,9 @@
   "date_arrivee",
   "section_break_10",
   "amended_from",
-  "element_de_voyage_application_details"
+  "element_de_voyage_application_details",
+  "travel_itinerary_section",
+  "travel_itinerary"
  ],
  "fields": [
   {
@@ -84,12 +86,22 @@
    "fieldname": "date_arrivee",
    "fieldtype": "Date",
    "label": "Date Arrivee"
+  },
+  {
+   "fieldname": "travel_itinerary_section",
+   "fieldtype": "Section Break",
+   "label": "Travel Itinerary"
+  },
+  {
+   "fieldname": "travel_itinerary",
+   "fieldtype": "Table",
+   "options": "Travel Itinerary"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-11-17 11:15:20.167208",
+ "modified": "2023-03-02 08:22:47.393127",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Element de Voyage Application",
