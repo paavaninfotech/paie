@@ -153,6 +153,7 @@ class CustomSalarySlip(SalarySlip):
 							"interest_amount_foreign_currency": amounts["interest_amount"] / loan.exchange_rate,
 							"principal_amount_foreign_currency": amounts["payable_principal_amount"] / loan.exchange_rate,
 							"loan_exchange_rate":loan.exchange_rate,
+							"loan_type": loan.loan_type,
 						},
 					)
 
