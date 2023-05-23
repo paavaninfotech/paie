@@ -7,7 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "anciennete_rate",
-  "conge_days_5_years"
+  "conge_days_5_years",
+  "jour_ouvrable"
  ],
  "fields": [
   {
@@ -19,12 +20,17 @@
    "fieldname": "conge_days_5_years",
    "fieldtype": "Float",
    "label": "Conge Days 5 Years"
+  },
+  {
+   "fieldname": "jour_ouvrable",
+   "fieldtype": "Float",
+   "label": "Jour Ouvrable"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-10-19 14:52:31.490788",
+ "modified": "2023-05-23 16:04:44.951056",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Custom Paie Settings",

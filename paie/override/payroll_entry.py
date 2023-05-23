@@ -74,6 +74,7 @@ class CustomPayrollEntry(PayrollEntry):
         try:
             payroll_entry = frappe.get_doc("Payroll Entry", args.payroll_entry)
             salary_slips_exist_for = self.get_existing_salary_slips(employees, args)
+            jour_ouvrable = frappe.db.get_single_value("Custom Paie Settings", "jour_ouvrable")
             count = 0
 
             #frappe.msgprint(str(salary_slips_exist_for))
@@ -130,7 +131,7 @@ class CustomPayrollEntry(PayrollEntry):
                             #"hours_60": employee.hours_60,
                             #"absence": employee.absence, 
 
-                            "present_days": (26 - attendances[0].absence) if len(attendances) > 0 else 26, 
+                            "present_days": (jour_ouvrable - attendances[0].absence) if len(attendances) > 0 else jour_ouvrable, 
                             "hours_30": attendances[0].hours_30 if len(attendances) > 0 else 0, 
                             "night_hours": attendances[0].night_hours if len(attendances) > 0 else 0, 
                             "sunday_hours": attendances[0].sunday_hours if len(attendances) > 0 else 0, 
