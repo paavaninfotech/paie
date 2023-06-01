@@ -8,7 +8,8 @@
  "field_order": [
   "anciennete_rate",
   "conge_days_5_years",
-  "jour_ouvrable"
+  "jour_ouvrable",
+  "background_workers"
  ],
  "fields": [
   {
@@ -25,12 +26,17 @@
    "fieldname": "jour_ouvrable",
    "fieldtype": "Float",
    "label": "Jour Ouvrable"
+  },
+  {
+   "fieldname": "background_workers",
+   "fieldtype": "Int",
+   "label": "Background Workers"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-05-23 16:04:44.951056",
+ "modified": "2023-05-24 18:37:20.673405",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Custom Paie Settings",

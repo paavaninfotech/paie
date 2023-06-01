@@ -201,7 +201,7 @@ class CustomPayrollEntry(PayrollEntry):
                 self.db_set("status", "Queued")
                 frappe.enqueue(
                     self.create_salary_slips_for_employees,
-                    timeout=1200,
+                    timeout=1800,
                     employees=employees,
                     args=args,
                     publish_progress=True,
