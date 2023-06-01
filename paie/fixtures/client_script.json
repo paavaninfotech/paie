@@ -4,10 +4,10 @@
   "doctype": "Client Script",
   "dt": "Loan Type",
   "enabled": 1,
-  "modified": "2022-11-08 16:47:39.027260",
+  "modified": "2023-05-10 15:10:11.201370",
   "module": null,
   "name": "Loan Type Filter Override",
-  "script": "frappe.ui.form.on('Loan Type', {\r\n\tonload: function(frm) {\r\n\t\t$.each([\"penalty_income_account\", \"interest_income_account\"], function (i, field) {\r\n\t\t\tfrm.set_query(field, function () {\r\n\t\t\t\treturn {\r\n\t\t\t\t\t\"filters\": {\r\n\t\t\t\t\t\t\"company\": frm.doc.company,\r\n\t\t\t\t\t\t\"root_type\": \"Income\",\r\n\t\t\t\t\t\t\"is_group\": 0\r\n\t\t\t\t\t}\r\n\t\t\t\t};\r\n\t\t\t});\r\n\t\t});\r\n\r\n\t\t$.each([\"payment_account\", \"loan_account\", \"disbursement_account\"], function (i, field) {\r\n\t\t\tfrm.set_query(field, function () {\r\n\t\t\t\treturn {\r\n\t\t\t\t\t\"filters\": [\r\n                        [\"company\", \"=\", frm.doc.company],\r\n                        [\"root_type\", \"IN\", [\"Asset\", \"Liability\"]],\r\n                        [\"is_group\", \"=\", 0]\r\n                    ]\r\n\t\t\t\t};\r\n\t\t\t});\r\n\t\t});\r\n\t}\r\n});",
+  "script": "frappe.ui.form.on('Loan Type', {\r\n\tonload: function(frm) {\r\n\t\t$.each([\"penalty_income_account\", \"interest_income_account\"], function (i, field) {\r\n\t\t\tfrm.set_query(field, function () {\r\n\t\t\t\treturn {\r\n\t\t\t\t\t\"filters\": {\r\n\t\t\t\t\t\t\"company\": frm.doc.company,\r\n\t\t\t\t\t\t\"root_type\": \"Income\",\r\n\t\t\t\t\t\t\"is_group\": 0\r\n\t\t\t\t\t}\r\n\t\t\t\t};\r\n\t\t\t});\r\n\t\t});\r\n\r\n\t\t$.each([\"payment_account\", \"loan_account\", \"disbursement_account\"], function (i, field) {\r\n\t\t\tfrm.set_query(field, function () {\r\n\t\t\t\treturn {\r\n\t\t\t\t\t\"filters\": [\r\n                        [\"company\", \"=\", frm.doc.company],\r\n                        [\"root_type\", \"IN\", [\"Asset\", \"Liability\"]],\r\n                        [\"is_group\", \"=\", 0]\r\n                    ]\r\n\t\t\t\t};\r\n\t\t\t});\r\n\t\t});\r\n\t}\r\n});\r\n\r\n",
   "view": "Form"
  },
  {
