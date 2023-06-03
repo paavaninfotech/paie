@@ -23,8 +23,21 @@ from erpnext.loan_management.doctype.loan_repayment.loan_repayment import (
 from paie.override.loan_repayment import (
 	create_repayment_entry2,
 )
+from hrms.payroll.doctype.payroll_period.payroll_period import (
+	get_payroll_period,
+	get_period_factor,
+)
 
 class CustomSalarySlip(SalarySlip):
+
+	@property
+	def remaining_sub_periods(self):
+		if not hasattr(self, "_remaining_sub_periods"):
+			self._remaining_sub_periods = get_period_factor(
+				self.employee, self.start_date, self.end_date, self.payroll_frequency, self.payroll_period
+			)[1]
+
+		return self._remaining_sub_periods
 
 	def check_existing(self):
 			if not self.salary_slip_based_on_timesheet:
@@ -91,6 +104,13 @@ class CustomSalarySlip(SalarySlip):
 	def calculate_net_pay(self):
 		if self.salary_structure:
 			self.calculate_component_amounts("earnings")
+
+		# get remaining numbers of sub-period (period for which one salary is processed)
+		#if self.pay_period:
+		#	self.remaining_sub_periods = get_period_factor(
+		#		self.employee, self.start_date, self.end_date, self.payroll_frequency, self.payroll_period
+		#	)[1]
+		
 		self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1)
 		self.base_gross_pay = flt(
 			flt(self.gross_pay) * flt(self.exchange_rate), self.precision("base_gross_pay")
@@ -217,7 +237,7 @@ class CustomSalarySlip(SalarySlip):
 			)
 		self.set_net_total_in_words()
 
-	def calculate_lwp_or_ppl_based_on_leave_application(self, holidays, working_days):
+	def calculate_lwp_or_ppl_based_on_leave_application(self, holidays, working_days, relieving_date):
 		lwp = 0
 		holidays = "','".join(holidays)
 		feries = holidays.split(',')
@@ -231,6 +251,8 @@ class CustomSalarySlip(SalarySlip):
 			date = add_days(cstr(getdate(self.start_date)), d)
 			leave = get_lwp_or_ppl_for_date(date, self.employee, holidays)
 			#frappe.msgprint(str(d) + " | " + str(date))
+			#if relieving_date and d > relieving_date:
+			#	continue
 			if leave:
 				equivalent_lwp_count = 0
 				is_half_day_leave = cint(leave[0].is_half_day)

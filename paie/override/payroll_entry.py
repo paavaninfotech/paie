@@ -113,7 +113,7 @@ class CustomPayrollEntry(PayrollEntry):
                             WHERE a.pay_period = '%s' AND employee = '%s' AND a.docstatus = 1  
                         """ % (payroll_entry.payroll_period,emp), as_dict = 1
                     )
-                    if not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type, "payroll_period": self.payroll_period}):
+                    if not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type, "pay_period": self.payroll_period}):
                         args.update({
                             "doctype": "Salary Slip", 
                             "employee": emp, 
@@ -194,7 +194,7 @@ class CustomPayrollEntry(PayrollEntry):
                     "exchange_rate": self.exchange_rate,
                     "currency": self.currency,
                     "eventual": self.eventual,
-                    "payroll_period": self.payroll_period
+                    "pay_period": self.payroll_period
                 }
             )
             if len(employees) > 30 or frappe.flags.enqueue_payroll_entry:
