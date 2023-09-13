@@ -13,7 +13,8 @@ class Attendancelist(Document):
 		for e in lines:
 			#frappe.msgprint(e.employee)
 			emp = frappe.get_doc('Employee', e.employee)
-			emp.present_days = 26 - e.absence
+			jour_ouvrable = frappe.db.get_single_value('Custom Paie Settings', 'jour_ouvrable')
+			emp.present_days = jour_ouvrable - e.absence
 			emp.absence = e.absence
 			emp.sunday_hours = e.sunday_hours
 			emp.hours_30 = e.hours_30

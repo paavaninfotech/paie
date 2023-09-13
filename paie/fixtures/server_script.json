@@ -2,6 +2,7 @@
  {
   "allow_guest": 0,
   "api_method": "get_emp_shift",
+  "cron_format": null,
   "disabled": 0,
   "docstatus": 0,
   "doctype": "Server Script",
@@ -17,6 +18,7 @@
  {
   "allow_guest": 0,
   "api_method": "get_emp_shift_in",
+  "cron_format": null,
   "disabled": 0,
   "docstatus": 0,
   "doctype": "Server Script",
@@ -32,6 +34,7 @@
  {
   "allow_guest": 0,
   "api_method": null,
+  "cron_format": null,
   "disabled": 0,
   "docstatus": 0,
   "doctype": "Server Script",
@@ -47,6 +50,7 @@
  {
   "allow_guest": 0,
   "api_method": "test_api",
+  "cron_format": null,
   "disabled": 0,
   "docstatus": 0,
   "doctype": "Server Script",
@@ -62,6 +66,7 @@
  {
   "allow_guest": 0,
   "api_method": null,
+  "cron_format": null,
   "disabled": 0,
   "docstatus": 0,
   "doctype": "Server Script",
@@ -77,6 +82,7 @@
  {
   "allow_guest": 0,
   "api_method": null,
+  "cron_format": null,
   "disabled": 0,
   "docstatus": 0,
   "doctype": "Server Script",
@@ -92,6 +98,7 @@
  {
   "allow_guest": 0,
   "api_method": "get_employee_dependant2",
+  "cron_format": null,
   "disabled": 0,
   "docstatus": 0,
   "doctype": "Server Script",
@@ -107,6 +114,7 @@
  {
   "allow_guest": 0,
   "api_method": null,
+  "cron_format": null,
   "disabled": 0,
   "docstatus": 0,
   "doctype": "Server Script",
@@ -118,5 +126,37 @@
   "reference_doctype": "Item",
   "script": "s = frappe.get_doc('Shift Type','Morning')\ns.last_sync_of_checkin =  frappe.utils.add_to_date(frappe.utils.today(), days=-1, as_string=True) + ' 23:59:59'\ns.save()\n\ns = frappe.get_doc('Shift Type','Night')\ns.last_sync_of_checkin =  frappe.utils.add_to_date(frappe.utils.today(), days=-3, as_string=True) + ' 23:59:59'\ns.save()\n",
   "script_type": "Scheduler Event"
+ },
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "cron_format": null,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "event_frequency": "All",
+  "modified": "2023-06-08 17:57:47.025824",
+  "module": null,
+  "name": "Set Account Sage Code",
+  "reference_doctype": "Stock Entry",
+  "script": "if doc.stock_entry_type == \"Material Issue\":\n    account = frappe.db.sql(\n    \t\t\"\"\"\n    \t\t\tSELECT a.name\n    \t\t\tFROM tabAccount a INNER JOIN `tabCode Compte Comptable` c ON c.sage_code = a.account_number\n    \t\t\tWhere c.web_service = %s\n    \t\t\"\"\",(doc.ws_code), as_dict = 1\n    )\n    \n    for e in doc.items:\n        e.expense_account = account[0].name",
+  "script_type": "DocType Event"
+ },
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "cron_format": null,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "event_frequency": "All",
+  "modified": "2023-06-08 17:41:05.752730",
+  "module": null,
+  "name": "Set Details Branch and Cost center",
+  "reference_doctype": "Material Request",
+  "script": "for i in doc.items:\n    i.branch = doc.branch\n    i.cost_center = doc.cost_center",
+  "script_type": "DocType Event"
  }
 ]

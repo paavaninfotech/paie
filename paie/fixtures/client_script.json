@@ -2,6 +2,39 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
+  "dt": "Item",
+  "enabled": 1,
+  "modified": "2023-04-10 10:39:29.667256",
+  "module": null,
+  "name": "Famille Statistique Filters",
+  "script": "frappe.ui.form.on('Item', {\n\tsetup(frm) {\n\t\tfrm.set_query(\"category\", function() {\n\t\t\treturn {\n\t\t\t\t\"filters\": {\n\t\t\t\t\t\"level\": 20\n\t\t\t\t}\n\t\t\t};\n\t\t});\n\t\tfrm.set_query(\"sub_category\", function() {\n\t\t\treturn {\n\t\t\t\t\"filters\": {\n\t\t\t\t\t\"level\": 21\n\t\t\t\t}\n\t\t\t};\n\t\t});\n\t}\n\t\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Material Request",
+  "enabled": 1,
+  "modified": "2023-06-21 15:51:44.353780",
+  "module": null,
+  "name": "Material Issue Location Filter",
+  "script": "frappe.ui.form.on('Material Request', {\n\trefresh(frm) {\n\t\t// your code here\n\t\tif (frm.is_new()) frm.set_value('ws_code', 'ZSMO_' + frm.doc.issue_type.substring(0, 3))\n\t\tfrm.add_custom_button('Warehouse Stock',() =>{\n            new frappe.ui.form.MultiSelectDialog({\n                doctype: \"Bin\",\n                target: cur_frm,\n                setters: {\n                    warehouse: \"\",\n\t\t\t\t\titem_code: \"\",\n\t\t\t\t\titem_name: \"\",\n\t\t\t\t\tactual_qty: \"\",\n                },\n                add_filters_group: 1,\n                columns: [\"name\", \"warehouse\", \"item_code\",\"item_name\", \"actual_qty\"],\n                get_query() {\n                    return {\n                        filters: null\n                    }\n                },\n                action(selections, args) {\n                    console.log(\"params\");\n                    selections.forEach(e => {\n\t\t\t\t\t\tvar row = cur_frm.add_child('items');\n\t\t\t\t\t\tfrappe.db.get_doc(\"Bin\",e).then(b =>{\n\t\t\t\t\t\t    frappe.db.get_doc(\"Item\",b.item_code).then(i => {\n\t\t\t\t\t\t        row.item_code = b.item_code;\n        \t\t\t\t\t\trow.warehouse = b.warehouse;\n        \t\t\t\t\t\trow.qty = b.actual_qty;\n        \t\t\t\t\t\trow.description = i.item_name;\n        \t\t\t\t\t\trow.uom = b.stock_uom;\n        \t\t\t\t\t\trow.branch = cur_frm.doc.branch;\n    \t\t                    row.cost_center = cur_frm.doc.cost_center;\n        \t\t\t\t\t\t//console.log(b);\n        \t\t\t\t\t\tfrm.events.get_item_data(frm, row, false);\n        \t\t\t\t\t\tif(cur_frm.doc.schedule_date) {\n                        \t\t\trow.schedule_date = cur_frm.doc.schedule_date;\n                        \t\t\tcur_frm.refresh_field('schedule_date');\n                        \t\t} else {\n                        \t\t\tcur_frm.script_manager.copy_from_first_row(\"items\", row, [\"schedule_date\"]);\n                        \t\t}\n        \t\t\t\t\t\tcur_frm.dirty();\n    \t\t\t\t\t        cur_frm.refresh_field('items');\n\t\t\t\t\t\t    });\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\t\t\t\t\t\n                },\n                //allow_child_item_selection: true,\n                //child_fieldname: \"availability_details\",\n                //child_columns: [\"description\",\"day\",\"start_time\",\"end_time\"] // retorune name dans args.filtered_children   \n            });\n        },);\n\t},\n\tissue_type(frm) {\n\t    frm.set_value('ws_code', 'ZSMO_' + frm.doc.issue_type.substring(0, 3))\n\t},\n});\n\nfrappe.ui.form.on('Material Request Item', {\n    items_add(frm, cdt, cdn) {\n\t\tvar row = locals[cdt][cdn];\n\t\trow.branch = frm.doc.branch;\n\t\trow.cost_center = frm.doc.cost_center;\n\t\tfrm.refresh_field(\"items\");\n\t}\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Material Request",
+  "enabled": 0,
+  "modified": "2023-05-11 11:15:36.773506",
+  "module": null,
+  "name": "Material Issue To Stock Entry",
+  "script": "frappe.ui.form.on('Material Request', {\n\trefresh(frm) {\n\t\tif (frm.doc.material_request_type === \"Material Issue\") {\n\t\t\t\t\tfrm.add_custom_button(__(\"Issue Material\"),\n\t\t\t\t\t\t() => frm.events.make_stock_entry(frm), __('Create'));\n\t\t\t\t}\n\t},\n\tmake_stock_entry: function(frm) {\n\t\tfrappe.model.open_mapped_doc({\n\t\t\tmethod: \"sage_integration.overrides.materiel_request.make_stock_entry2\",\n\t\t\tfrm: frm\n\t\t});\n\t},\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
   "dt": "Loan Type",
   "enabled": 1,
   "modified": "2023-05-10 15:10:11.201370",
