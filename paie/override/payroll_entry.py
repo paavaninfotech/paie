@@ -75,6 +75,7 @@ class CustomPayrollEntry(PayrollEntry):
             payroll_entry = frappe.get_doc("Payroll Entry", args.payroll_entry)
             salary_slips_exist_for = self.get_existing_salary_slips(employees, args)
             jour_ouvrable = frappe.db.get_single_value("Custom Paie Settings", "jour_ouvrable")
+            multiple_salary_in_period = frappe.db.get_single_value("Custom Paie Settings", "multiple_salary_in_period")
             count = 0
 
             #frappe.msgprint(str(salary_slips_exist_for))
@@ -113,7 +114,11 @@ class CustomPayrollEntry(PayrollEntry):
                             WHERE a.pay_period = '%s' AND employee = '%s' AND a.docstatus = 1  
                         """ % (payroll_entry.payroll_period,emp), as_dict = 1
                     )
-                    if not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type, "pay_period": self.payroll_period}):
+                    if multiple_salary_in_period :
+                        exist = frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type, "pay_period": self.payroll_period, "start_date": ["<=", self.start_date], "end_date": [">=", self.start_date]})
+                    else:
+                        exist = frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type, "pay_period": self.payroll_period})
+                    if not exist :
                         args.update({
                             "doctype": "Salary Slip", 
                             "employee": emp, 

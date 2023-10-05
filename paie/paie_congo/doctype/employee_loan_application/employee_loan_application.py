@@ -10,6 +10,17 @@ class EmployeeloanApplication(Document):
 	def on_submit(self):
 		self.create_loan()
 
+	def on_cancel(self):
+		loans = frappe.get_list("Loan", {"employee_loan_application":self.name})
+		for loan in loans:
+			doc = frappe.get_doc("Loan Interest Accrual",{"Loan":loan.name},["name"])
+			doc.cancel()
+			doc = frappe.get_doc("Loan Disbursement",{"against_loan":loan.name},["name"])
+			doc.cancel()
+			doc = frappe.get_doc("Process Loan Interest Accrual",{"loan":loan.name},["name"])
+			doc.cancel()
+			loan.cancel()     
+
 	def check_mandatory(self):
 		for fieldname in ["posting_date", "period_start", "period_end", "loan_start_date", "loan_type"]:
 			if not self.get(fieldname):

@@ -9,9 +9,12 @@
   "anciennete_rate",
   "conge_days_5_years",
   "jour_ouvrable",
+  "working_hours_per_day",
   "background_workers",
   "column_break_fexnh",
-  "anciennete_en_annee"
+  "anciennete_en_annee",
+  "multiple_salary_in_period",
+  "employee_checking"
  ],
  "fields": [
   {
@@ -43,12 +46,30 @@
    "fieldname": "anciennete_en_annee",
    "fieldtype": "Check",
    "label": "Anciennete en Ann\u00e9e"
+  },
+  {
+   "default": "0",
+   "fieldname": "multiple_salary_in_period",
+   "fieldtype": "Check",
+   "label": "Multiple Salary in Period"
+  },
+  {
+   "default": "0",
+   "fieldname": "employee_checking",
+   "fieldtype": "Check",
+   "label": "Employee Checking"
+  },
+  {
+   "default": "8",
+   "fieldname": "working_hours_per_day",
+   "fieldtype": "Float",
+   "label": "Working Hours per Day"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-09-13 17:33:07.848395",
+ "modified": "2023-09-27 10:15:46.316792",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Custom Paie Settings",

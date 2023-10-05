@@ -81,46 +81,63 @@ class Attendancelist(Document):
 def get_attendance_list(debut, fin, branch="", employment_type=""):
 	branch = branch + "%" if not branch is None else "%"
 	employment_type = employment_type + "%" if not employment_type is None else "%"
-	return frappe.db.sql("""
-			SELECT v.employee AS employee, v.real_working_hours/9 AS jour_preste, 26 -  v.real_working_hours/9 AS absence, v.holidays_working AS sunday_hours,
-			CASE WHEN v.avant + v.apres >= 6 THEN 6 ELSE v.avant + v.apres END AS hours_30,
-			CASE WHEN v.avant + v.apres >= 6 THEN v.avant + v.apres - 6 ELSE 0 END AS hours_60,
-			v.night_hours AS night_hours
-			FROM (
-				SELECT u.employee, u.employee_name, SUM(u.real_working_hours) AS real_working_hours, SUM(u.avant) AS avant, SUM(u.apres) AS apres, SUM(u.late_hours) AS late_hours,
-					SUM(u.holidays) AS holidays_working, SUM(u.working_hours) AS working_hours, SUM(u.night_hours) AS night_hours
-				FROM
-				(
-					SELECT t.employee, t.employee_name, t.attendance_date,t.in_date_time, t.out_date_time,
-					TIME_TO_SEC(timediff(t.out_date_time, t.in_date_time))/3600 AS real_working_hours,t.avant, t.apres, t.status, t.late_hours, t.night_hours, t.holidays,
-					t.working_hours
-					FROM(
-						SELECT a.employee, a.employee_name, a.attendance_date,
-						CAST(CONCAT(CAST(CAST(a.in_time AS DATE) AS NCHAR), ' ',
-						CAST(CASE WHEN  time(a.in_time) < s.start_time THEN s.start_time ELSE time(a.in_time) END AS NCHAR),19) AS DATETIME) AS in_date_time,
-						CAST(CONCAT(CAST(CAST(a.out_time AS DATE) AS NCHAR), ' ',
-						CAST(CASE WHEN  time(a.out_time) < s.end_time THEN time(a.out_time) ELSE s.end_time END AS NCHAR),19) AS DATETIME) AS out_date_time,
-						TIME_TO_SEC(CASE WHEN timediff(time(a.in_time), time(s.start_time))  < 0 THEN timediff(time(s.start_time), time(a.in_time)) ELSE 0 END) / 3600 avant,
-						TIME_TO_SEC(CASE WHEN timediff(time(a.out_time), time(s.end_time))  > 0 THEN timediff(time(a.out_time), time(s.end_time)) ELSE 0 END) / 3600 apres,
-						CASE WHEN IFNULL(a.attendance_date = (SELECT holiday_date FROM tabHoliday h WHERE a.attendance_date = h.holiday_date),0) THEN 'Holidays'
-						ELSE CASE WHEN a.working_hours < 4 THEN 'Absent' ELSE a.status END END AS status, 
-						TIME_TO_SEC(CASE WHEN timediff(time(DATE_SUB(a.in_time, INTERVAL s.late_entry_grace_period MINUTE)), time(s.start_time))  < 0 THEN 
-							timediff(time(s.start_time), time(DATE_SUB(a.in_time, INTERVAL s.late_entry_grace_period MINUTE))) ELSE 0 END) / 3600 +
-						TIME_TO_SEC(CASE WHEN timediff(time(a.out_time), time(s.end_time))  < 0 THEN timediff(time(s.end_time), time(a.out_time)) ELSE 0 END) / 3600
-							AS late_hours,
-						CASE WHEN s.name = 'Night'THEN working_hours ELSE 0 END AS night_hours, 
-						CASE WHEN IFNULL(a.attendance_date = (SELECT holiday_date FROM tabHoliday h WHERE a.attendance_date = h.holiday_date),0) THEN a.working_hours ELSE 0 END AS holidays, 
-						a.working_hours
-						FROM `tabAttendance` a INNER JOIN `tabShift Type` s ON a.shift = s.name INNER JOIN tabEmployee e ON e.name = a.employee
-						WHERE a.attendance_date BETWEEN %(debut)s AND %(fin)s AND e.branch LIKE %(branch)s AND e.employment_type LIKE %(employment_type)s
-					) AS t
-				) AS u
-				GROUP BY  u.employee, u.employee_name
-			) AS v
-		""", {"debut":debut, "fin":fin, "branch":branch, "employment_type":employment_type},
-		as_dict =True,
-		
-	)
+	employee_checking = frappe.db.get_single_value('Custom Paie Settings', 'employee_checking')
+	if employee_checking :
+		return frappe.db.sql("""
+				SELECT v.employee AS employee, v.real_working_hours/9 AS jour_preste, 26 -  v.real_working_hours/9 AS absence, v.holidays_working AS sunday_hours,
+				CASE WHEN v.avant + v.apres >= 6 THEN 6 ELSE v.avant + v.apres END AS hours_30,
+				CASE WHEN v.avant + v.apres >= 6 THEN v.avant + v.apres - 6 ELSE 0 END AS hours_60,
+				v.night_hours AS night_hours
+				FROM (
+					SELECT u.employee, u.employee_name, SUM(u.real_working_hours) AS real_working_hours, SUM(u.avant) AS avant, SUM(u.apres) AS apres, SUM(u.late_hours) AS late_hours,
+						SUM(u.holidays) AS holidays_working, SUM(u.working_hours) AS working_hours, SUM(u.night_hours) AS night_hours
+					FROM
+					(
+						SELECT t.employee, t.employee_name, t.attendance_date,t.in_date_time, t.out_date_time,
+						TIME_TO_SEC(timediff(t.out_date_time, t.in_date_time))/3600 AS real_working_hours,t.avant, t.apres, t.status, t.late_hours, t.night_hours, t.holidays,
+						t.working_hours
+						FROM(
+							SELECT a.employee, a.employee_name, a.attendance_date,
+							CAST(CONCAT(CAST(CAST(a.in_time AS DATE) AS NCHAR), ' ',
+							CAST(CASE WHEN  time(a.in_time) < s.start_time THEN s.start_time ELSE time(a.in_time) END AS NCHAR),19) AS DATETIME) AS in_date_time,
+							CAST(CONCAT(CAST(CAST(a.out_time AS DATE) AS NCHAR), ' ',
+							CAST(CASE WHEN  time(a.out_time) < s.end_time THEN time(a.out_time) ELSE s.end_time END AS NCHAR),19) AS DATETIME) AS out_date_time,
+							TIME_TO_SEC(CASE WHEN timediff(time(a.in_time), time(s.start_time))  < 0 THEN timediff(time(s.start_time), time(a.in_time)) ELSE 0 END) / 3600 avant,
+							TIME_TO_SEC(CASE WHEN timediff(time(a.out_time), time(s.end_time))  > 0 THEN timediff(time(a.out_time), time(s.end_time)) ELSE 0 END) / 3600 apres,
+							CASE WHEN IFNULL(a.attendance_date = (SELECT holiday_date FROM tabHoliday h WHERE a.attendance_date = h.holiday_date),0) THEN 'Holidays'
+							ELSE CASE WHEN a.working_hours < 4 THEN 'Absent' ELSE a.status END END AS status, 
+							TIME_TO_SEC(CASE WHEN timediff(time(DATE_SUB(a.in_time, INTERVAL s.late_entry_grace_period MINUTE)), time(s.start_time))  < 0 THEN 
+								timediff(time(s.start_time), time(DATE_SUB(a.in_time, INTERVAL s.late_entry_grace_period MINUTE))) ELSE 0 END) / 3600 +
+							TIME_TO_SEC(CASE WHEN timediff(time(a.out_time), time(s.end_time))  < 0 THEN timediff(time(s.end_time), time(a.out_time)) ELSE 0 END) / 3600
+								AS late_hours,
+							CASE WHEN s.name = 'Night'THEN working_hours ELSE 0 END AS night_hours, 
+							CASE WHEN IFNULL(a.attendance_date = (SELECT holiday_date FROM tabHoliday h WHERE a.attendance_date = h.holiday_date),0) THEN a.working_hours ELSE 0 END AS holidays, 
+							a.working_hours
+							FROM `tabAttendance` a INNER JOIN `tabShift Type` s ON a.shift = s.name INNER JOIN tabEmployee e ON e.name = a.employee
+							WHERE a.attendance_date BETWEEN %(debut)s AND %(fin)s AND e.branch LIKE %(branch)s AND e.employment_type LIKE %(employment_type)s
+						) AS t
+					) AS u
+					GROUP BY  u.employee, u.employee_name
+				) AS v
+			""", {"debut":debut, "fin":fin, "branch":branch, "employment_type":employment_type},
+			as_dict =True,
+			)
+	else:
+		return frappe.db.sql("""
+				SELECT t.employee, t.employee_name, SUM(jour_preste) AS jour_preste, SUM(asbence) AS asbence, SUM(holidays) AS sunday_hours, 0 AS hours_30, 0 AS hours_60
+				FROM(
+					SELECT a.employee, a.employee_name,a.attendance_date,
+						CASE WHEN a.status = 'Present' THEN 1 ELSE 0 END AS jour_preste,
+						CASE WHEN a.status = 'Absent' THEN 1 ELSE 0 END AS asbence,
+						CASE WHEN IFNULL(a.attendance_date = (SELECT holiday_date FROM tabHoliday h WHERE a.attendance_date = h.holiday_date),0) THEN 1 ELSE 0 END * s.working_hours_per_day AS holidays 
+					FROM tabAttendance a INNER JOIN tabEmployee e ON e.name = a.employee CROSS JOIN 
+						(SELECT value AS working_hours_per_day  FROM tabSingles WHERE doctype = 'Custom Paie Settings' AND field = 'working_hours_per_day') s
+					WHERE a.attendance_date BETWEEN %(debut)s AND %(fin)s AND e.branch LIKE %(branch)s AND e.employment_type LIKE %(employment_type)s
+				) AS t
+				GROUP BY t.employee, t.employee_name
+			""", {"debut":debut, "fin":fin, "branch":branch, "employment_type":employment_type},
+			as_dict =True,
+		)
 
 def log_attendance_failure(process, attendance_list, error):
 	error_log = frappe.log_error(
