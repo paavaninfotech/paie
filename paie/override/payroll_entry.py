@@ -30,6 +30,7 @@ from erpnext.accounts.utils import get_fiscal_year
 from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee
 from hrms.hr.utils import get_holiday_dates_for_employee
 from paie.override.journal_entry import CustomJournalEntry
+from erpnext.loan_management.doctype.process_loan_interest_accrual.process_loan_interest_accrual import process_loan_interest_accrual_for_term_loans
 
 class CustomPayrollEntry(PayrollEntry):
 
@@ -72,6 +73,19 @@ class CustomPayrollEntry(PayrollEntry):
 
     def create_salary_slips_for_employees(self,employees, args, publish_progress=True):
         try:
+            process_loan_interest_accrual_for_term_loans()
+            liste = frappe.db.get_list("Loan","name",{"status": "Partially Disbursed"})
+            for i in liste:
+                dis = frappe.get_doc("Loan Disbursement",{"against_loan": i.name})
+                if i.loan_amount == dis.disbursement_amount:
+                    doc = frappe.get_doc({
+                        'doctype': 'Loan Disbursement',
+                        'disbursement_date': self.end_date,
+                        'disbursed_amount': 0,
+                        'against_loan': i.name,
+                    })
+                    doc.submit()
+                    
             payroll_entry = frappe.get_doc("Payroll Entry", args.payroll_entry)
             salary_slips_exist_for = self.get_existing_salary_slips(employees, args)
             jour_ouvrable = frappe.db.get_single_value("Custom Paie Settings", "jour_ouvrable")
