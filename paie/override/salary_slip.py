@@ -82,7 +82,7 @@ class CustomSalarySlip(SalarySlip):
 			self.validate_dates(joining_date, relieving_date)
 
 			# getin leave details
-			self.get_working_days_details(joining_date, relieving_date)
+			self.get_working_days_details_2(joining_date, relieving_date)
 			struct = ''
 			if not self.salary_structure : 
 				struct = self.check_sal_struct(joining_date, relieving_date)
@@ -297,6 +297,128 @@ class CustomSalarySlip(SalarySlip):
 					"Salary Slip Loan", loan.name, "loan_repayment_entry", repayment_entry.name
 				)
 
+	def calculate_lwp_or_ppl_based_on_leave_application_2(
+		self, holidays, working_days_list, relieving_date
+	):
+		lwp = 0
+		leave_type_lwp = []
+		type = ""
+		holidays = "','".join(holidays)
+		feries = holidays.split(',')
+		nb = len(feries)
+		daily_wages_fraction_for_half_day = (
+			flt(frappe.db.get_value("Payroll Settings", None, "daily_wages_fraction_for_half_day")) or 0.5
+		)
+		#frappe.msgprint(str(nb))
+		#frappe.msgprint(str(len(working_days_list)))
+
+		for d in range(31):
+			date = add_days(cstr(getdate(self.start_date)), d)
+			#leave = get_lwp_or_ppl_for_date_2(date, self.employee, holidays)
+			leave = {}
+
+			#frappe.msgprint(str(date))
+			if leave:
+				
+				#frappe.msgprint(str(leave))
+				equivalent_lwp_count = 0
+				is_half_day_leave = cint(leave[0].is_half_day)
+				is_partially_paid_leave = cint(leave[0].is_ppl)
+				fraction_of_daily_salary_per_leave = flt(leave[0].fraction_of_daily_salary_per_leave)
+
+				if leave[0].name == type : 
+					lwp += 1
+				else :
+					if lwp > 0 :
+						#frappe.msgprint({'leave_type': type,'jour': lwp,})
+						self.append('conge_pris',{
+								'leave_type': type,
+								'jour': lwp,
+							}
+						)
+						#leave_type_lwp.append({"type": type,"lwp":lwp})
+					lwp = 1
+					type = leave[0].name
+
+		#return leave_type_lwp
+
+	def get_working_days_details_2(
+		self, joining_date=None, relieving_date=None, lwp=None, for_preview=0
+	):
+		payroll_based_on = frappe.db.get_value("Payroll Settings", None, "payroll_based_on")
+		include_holidays_in_total_working_days = frappe.db.get_single_value(
+			"Payroll Settings", "include_holidays_in_total_working_days"
+		)
+
+		if not (joining_date and relieving_date):
+			joining_date, relieving_date = self.get_joining_and_relieving_dates()
+
+		working_days = date_diff(self.end_date, self.start_date) + 1
+		if for_preview:
+			self.total_working_days = working_days
+			self.payment_days = working_days
+			return
+
+		holidays = self.get_holidays_for_employee(self.start_date, self.end_date)
+		working_days_list = [
+			add_days(getdate(self.start_date), days=day) for day in range(0, working_days)
+		]
+
+		if not cint(include_holidays_in_total_working_days):
+			working_days_list = [i for i in working_days_list if i not in holidays]
+
+			working_days -= len(holidays)
+			if working_days < 0:
+				frappe.throw(_("There are more holidays than working days this month."))
+
+		if not payroll_based_on:
+			frappe.throw(_("Please set Payroll based on in Payroll settings"))
+
+		if payroll_based_on == "Attendance":
+			actual_lwp, absent = self.calculate_lwp_ppl_and_absent_days_based_on_attendance(
+				holidays, relieving_date
+			)
+			self.absent_days = absent
+		else:
+			actual_lwp = self.calculate_lwp_or_ppl_based_on_leave_application(
+				holidays, working_days_list, relieving_date
+			)
+
+			self.calculate_lwp_or_ppl_based_on_leave_application_2(
+				holidays, working_days_list, relieving_date
+			)
+
+		if not lwp:
+			lwp = actual_lwp
+		elif lwp != actual_lwp:
+			frappe.msgprint(
+				_("Leave Without Pay does not match with approved {} records").format(payroll_based_on)
+			)
+
+		self.leave_without_pay = lwp
+		self.total_working_days = working_days
+
+		payment_days = self.get_payment_days(
+			joining_date, relieving_date, include_holidays_in_total_working_days
+		)
+
+		if flt(payment_days) > flt(lwp):
+			self.payment_days = flt(payment_days) - flt(lwp)
+
+			if payroll_based_on == "Attendance":
+				self.payment_days -= flt(absent)
+
+			consider_unmarked_attendance_as = (
+				frappe.db.get_value("Payroll Settings", None, "consider_unmarked_attendance_as") or "Present"
+			)
+
+			if payroll_based_on == "Attendance" and consider_unmarked_attendance_as == "Absent":
+				unmarked_days = self.get_unmarked_days(include_holidays_in_total_working_days)
+				self.absent_days += unmarked_days  # will be treated as absent
+				self.payment_days -= unmarked_days
+		else:
+			self.payment_days = 0
+
 
 def get_payroll_payable_account(company, payroll_entry):
 	if payroll_entry:
@@ -309,5 +431,50 @@ def get_payroll_payable_account(company, payroll_entry):
 		)
 
 	return payroll_payable_account
+
+
+def get_lwp_or_ppl_for_date_2(date, employee, holidays):
+	LeaveApplication = frappe.qb.DocType("Leave Application")
+	LeaveType = frappe.qb.DocType("Leave Type")
+
+	is_half_day = (
+		frappe.qb.terms.Case()
+		.when(
+			(
+				(LeaveApplication.half_day_date == date)
+				| (LeaveApplication.from_date == LeaveApplication.to_date)
+			),
+			LeaveApplication.half_day,
+		)
+		.else_(0)
+	).as_("is_half_day")
+
+	query = (
+		frappe.qb.from_(LeaveApplication)
+		.inner_join(LeaveType)
+		.on((LeaveType.name == LeaveApplication.leave_type))
+		.select(
+			LeaveType.name,
+			LeaveType.is_ppl,
+			LeaveType.fraction_of_daily_salary_per_leave,
+			(is_half_day),
+		)
+		.where(
+			(((LeaveType.is_lwp == 1) | (LeaveType.is_ppl == 1)))
+			& (LeaveApplication.docstatus == 1)
+			& (LeaveApplication.status == "Approved")
+			& (LeaveApplication.employee == employee)
+			& ((LeaveApplication.salary_slip.isnull()) | (LeaveApplication.salary_slip == ""))
+			& ((LeaveApplication.from_date <= date) & (date <= LeaveApplication.to_date))
+		)
+		#.order_by(LeaveType.name)
+	)
+
+	# if it's a holiday only include if leave type has "include holiday" enabled
+	if date in holidays:
+		query = query.where((LeaveType.include_holiday == "1"))
+
+	return query.run(as_dict=True)
+
 
 

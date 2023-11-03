@@ -47,15 +47,15 @@ class Anciennete(Document):
 		for e in employees :
 			anciennete = e.anciennete if e.anciennete else 0.0
 			rate = rate if rate else 0.0
-			join_year = getdate(e.date_of_joining)
-			now_year = getdate(now())
+			join_year = getdate(e.date_of_joining).year
+			now_year = getdate(now()).year
 			self.append('anciennete_details',{
 						'employee': e.employee,
 						'date_of_join': e.date_of_joining,
 						'basic': e.basic_salary_per_day,
 						'current_anciennete': anciennete,
 						'rate': rate,
-						'new_anciennete': anciennete + ((e.basic_salary_per_day + anciennete) * rate /100 if not anciennete_en_annee else now_year - join_year),
+						'new_anciennete': (anciennete + ((e.basic_salary_per_day + anciennete) * rate /100) if not anciennete_en_annee else now_year - join_year),
 					}
 				)
 
