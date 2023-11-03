@@ -27,6 +27,7 @@ from hrms.payroll.doctype.payroll_period.payroll_period import (
 	get_payroll_period,
 	get_period_factor,
 )
+from collections import defaultdict
 
 class CustomSalarySlip(SalarySlip):
 
@@ -311,35 +312,37 @@ class CustomSalarySlip(SalarySlip):
 		)
 		#frappe.msgprint(str(nb))
 		#frappe.msgprint(str(len(working_days_list)))
+		#frappe.msgprint(str(holidays))
 
 		for d in range(31):
 			date = add_days(cstr(getdate(self.start_date)), d)
-			#leave = get_lwp_or_ppl_for_date_2(date, self.employee, holidays)
-			leave = {}
+			leave = get_lwp_or_ppl_for_date_2(date, self.employee, holidays)
 
-			#frappe.msgprint(str(date))
 			if leave:
-				
-				#frappe.msgprint(str(leave))
 				equivalent_lwp_count = 0
 				is_half_day_leave = cint(leave[0].is_half_day)
 				is_partially_paid_leave = cint(leave[0].is_ppl)
 				fraction_of_daily_salary_per_leave = flt(leave[0].fraction_of_daily_salary_per_leave)
 
-				if leave[0].name == type : 
-					lwp += 1
-				else :
-					if lwp > 0 :
-						#frappe.msgprint({'leave_type': type,'jour': lwp,})
-						self.append('conge_pris',{
-								'leave_type': type,
-								'jour': lwp,
-							}
-						)
-						#leave_type_lwp.append({"type": type,"lwp":lwp})
-					lwp = 1
-					type = leave[0].name
+				leave_type_lwp.append({"leave_type": leave[0].name,"jour":1})
+		
+		# Create a dictionary to count occurrences by 'leave_type'
+		occurrence_counts = {}
 
+		for entry in leave_type_lwp:
+			leave_type = entry['leave_type']
+			if leave_type in occurrence_counts:
+				occurrence_counts[leave_type] += 1
+			else:
+				occurrence_counts[leave_type] = 1
+		
+		frappe.msgprint(str(occurrence_counts))
+		for leave_type, count in occurrence_counts.items():
+			self.append('conge_pris',{
+					'leave_type': leave_type,
+					'jour': count,
+				}
+			)
 		#return leave_type_lwp
 
 	def get_working_days_details_2(
