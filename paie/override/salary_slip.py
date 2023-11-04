@@ -310,9 +310,9 @@ class CustomSalarySlip(SalarySlip):
 		daily_wages_fraction_for_half_day = (
 			flt(frappe.db.get_value("Payroll Settings", None, "daily_wages_fraction_for_half_day")) or 0.5
 		)
-		frappe.msgprint(str(nb))
-		frappe.msgprint(str(len(working_days_list)))
-		frappe.msgprint(str(holidays))
+		#frappe.msgprint(str(nb))
+		#frappe.msgprint(str(len(working_days_list)))
+		#frappe.msgprint(str(holidays))
 
 		nb_working_days = len(working_days_list) 
 		for d in range(nb_working_days):
@@ -337,7 +337,7 @@ class CustomSalarySlip(SalarySlip):
 			else:
 				occurrence_counts[leave_type] = 1
 		
-		frappe.msgprint(str(occurrence_counts))
+		#frappe.msgprint(str(occurrence_counts))
 		for leave_type, count in occurrence_counts.items():
 			self.append('conge_pris',{
 					'leave_type': leave_type,
