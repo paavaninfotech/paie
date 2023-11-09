@@ -325,13 +325,17 @@ class CustomSalarySlip(SalarySlip):
 				is_partially_paid_leave = cint(leave[0].is_ppl)
 				fraction_of_daily_salary_per_leave = flt(leave[0].fraction_of_daily_salary_per_leave)
 
-				leave_type_lwp.append({"leave_type": leave[0].name,"jour":1})
+				leave_type_lwp.append({"leave_type": leave[0].name,"jour":1, "fraction":fraction_of_daily_salary_per_leave,})
 		
 		# Create a dictionary to count occurrences by 'leave_type'
 		occurrence_counts = {}
+		total_conge = 0
 
 		for entry in leave_type_lwp:
+			total_conge = total_conge + 1
 			leave_type = entry['leave_type']
+			#fraction = entry['fraction']
+			#key = (leave_type, fraction)  # Create a tuple as the key
 			if leave_type in occurrence_counts:
 				occurrence_counts[leave_type] += 1
 			else:
@@ -342,8 +346,11 @@ class CustomSalarySlip(SalarySlip):
 			self.append('conge_pris',{
 					'leave_type': leave_type,
 					'jour': count,
+					#'fraction': fraction,
 				}
 			)
+		
+		self.total_leaves = total_conge
 		#return leave_type_lwp
 
 	def get_working_days_details_2(
