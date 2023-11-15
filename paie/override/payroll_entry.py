@@ -96,8 +96,11 @@ class CustomPayrollEntry(PayrollEntry):
             
             
             for emp in employees:
-                leaves = self.calcul_conge_annuel(emp, self.start_date, self.end_date)
                 employee = frappe.get_doc('Employee', emp)
+                if emp.vacation == 1 :
+                    continue # Skip to the next iteration
+
+                leaves = self.calcul_conge_annuel(emp, self.start_date, self.end_date)
                 #employee.absence = self.calcul_absence(emp)
                 employee.jour_conge = leaves
                 #employee.conge_period = leaves
@@ -455,6 +458,7 @@ class CustomPayrollEntry(PayrollEntry):
                     t1.name = t2.employee
                     and t2.docstatus = 1
                     and t1.status != 'Inactive'
+                    and t1.vacation = 0
             %s order by t2.from_date desc
             """
             % cond,
