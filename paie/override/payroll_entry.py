@@ -97,7 +97,7 @@ class CustomPayrollEntry(PayrollEntry):
             
             for emp in employees:
                 employee = frappe.get_doc('Employee', emp)
-                if emp.vacation == 1 :
+                if employee.vacation == 1 :
                     continue # Skip to the next iteration
 
                 leaves = self.calcul_conge_annuel(emp, self.start_date, self.end_date)
