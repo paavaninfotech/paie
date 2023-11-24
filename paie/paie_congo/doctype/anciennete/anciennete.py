@@ -18,8 +18,9 @@ class Anciennete(Document):
 
 
 	def get_employee(self):
-		company = self.company if not self.company == None  else '%'
-		branch = self.branch if not self.branch == None else '%'
+		company = self.company
+		branch = self.branch if self.branch else '%'
+		employment_type = self.employment_type if self.employment_type else '%'
 
 		for d in self.anciennete_details:
 			frappe.delete_doc(d.get("doctype"), d.get("name"))
@@ -33,10 +34,10 @@ class Anciennete(Document):
 				WHERE a.payroll_period = %(payroll_period)s
 			) t ON e.employee = t.employee  AND t.payroll_period = p.name
 			INNER JOIN 	`tabEmployee Category Details` c on e.employee_category_details = c.name
-			WHERE e.status = 'Active' AND e.company LIKE %(company)s AND (e.branch LIKE %(branch)s or e.branch IS NULL ) AND p.name = %(payroll_period)s
+			WHERE e.status = 'Active' AND e.company = %(company)s AND (e.branch LIKE %(branch)s or e.branch IS NULL ) AND p.name = %(payroll_period)s
 			AND DATE_ADD(e.date_of_joining, INTERVAL (YEAR(CURRENT_DATE()) - YEAR(e.date_of_joining)) YEAR) between p.start_date and p.end_date
 			AND t.employee IS NULL AND (e.employment_type LIKE %(employment_type)s) AND YEAR(e.date_of_joining) < YEAR(CURRENT_DATE())
-		""",{"company":company, "branch":branch, 'payroll_period': self.payroll_period, 'employment_type': self.employment_type},
+		""",{"company":company, "branch":branch, 'payroll_period': self.payroll_period, 'employment_type': employment_type},
 		as_dict =True,
 		)
 
