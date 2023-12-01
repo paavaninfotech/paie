@@ -128,6 +128,8 @@ class CustomPayrollEntry(PayrollEntry):
                     if len(ret_struc) > 0: 
                         salary_types = salary_types + ret_struc
 
+                frappe.msgprint(str(salary_types))
+
                 for t in salary_types:
                     #frappe.msgprint(str( not frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type, "payroll_period": self.payroll_period})))
                     #cat_details = frappe.get_doc("Employee Category Details", employee.employee_category_details)
