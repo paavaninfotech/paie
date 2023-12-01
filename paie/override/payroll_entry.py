@@ -112,7 +112,7 @@ class CustomPayrollEntry(PayrollEntry):
                 #Prime de fin d'année
                 if self.end_date.month == 12 :
                     leaves_struc = frappe.db.get_list(doctype="Salary Structure Assignment", fields=["salary_type", "salary_structure"], 
-                    filters={"eventual": 1, "employee": "51034", "docstatus": 1, 'salary_type': 'Prime annuelle'})
+                    filters={"eventual": 1, "employee": emp, "docstatus": 1, 'salary_type': 'Prime annuelle'})
                     if len(leaves_struc) > 0: 
                         salary_types = salary_types + leaves_struc
                 
