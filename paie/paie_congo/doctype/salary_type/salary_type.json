@@ -37,12 +37,12 @@
    "fieldname": "event_name",
    "fieldtype": "Select",
    "label": "Event Name",
-   "options": "\nCong\u00e9 Annuel\nRetraite"
+   "options": "\nCong\u00e9 Annuel\nRetraite\nPrime annuelle"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-10-19 14:51:57.665108",
+ "modified": "2023-12-02 10:30:19.842675",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Salary Type",

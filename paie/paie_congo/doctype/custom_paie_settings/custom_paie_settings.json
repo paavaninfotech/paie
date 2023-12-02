@@ -14,7 +14,8 @@
   "column_break_fexnh",
   "anciennete_en_annee",
   "multiple_salary_in_period",
-  "employee_checking"
+  "employee_checking",
+  "bonus_in_separate_slip"
  ],
  "fields": [
   {
@@ -64,12 +65,18 @@
    "fieldname": "working_hours_per_day",
    "fieldtype": "Float",
    "label": "Working Hours per Day"
+  },
+  {
+   "default": "0",
+   "fieldname": "bonus_in_separate_slip",
+   "fieldtype": "Check",
+   "label": "Yearly Bonus in Separate Slip"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-09-27 10:15:46.316792",
+ "modified": "2023-12-02 10:28:49.184573",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Custom Paie Settings",
