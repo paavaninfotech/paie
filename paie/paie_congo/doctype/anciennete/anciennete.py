@@ -8,13 +8,21 @@ from frappe.model.document import Document
 class Anciennete(Document):
 	
 	def before_save(self):
-		self.get_employee()
+		args = { "company": self.company, "payroll_period": self.payroll_period, "branch": self.branch if self.branch else ["is", "not set"], "employment_type": self.employment_type if self.employment_type else ["is", "not set"],  }
+		exist = frappe.db.exists("Anciennete", args)
+		
+		if not exist :
+			self.get_employee()
 
 	def on_submit(self):
-		for d in self.anciennete_details:
-			doc = frappe.get_doc("Employee", d.employee)
-			doc.anciennete = d.new_anciennete
-			doc.save()
+		args = { "company": self.company, "payroll_period": self.payroll_period, "branch": self.branch if self.branch else ["is", "not set"], "employment_type": self.employment_type if self.employment_type else ["is", "not set"],  }
+		exist = frappe.db.exists("Anciennete", args)
+		
+		if not exist :
+			for d in self.anciennete_details:
+				doc = frappe.get_doc("Employee", d.employee)
+				doc.anciennete = d.new_anciennete
+				doc.save()
 
 
 	def get_employee(self):
@@ -22,6 +30,7 @@ class Anciennete(Document):
 		branch = self.branch if self.branch else '%'
 		employment_type = self.employment_type if self.employment_type else '%'
 
+		
 		for d in self.anciennete_details:
 			frappe.delete_doc(d.get("doctype"), d.get("name"))
 
@@ -33,10 +42,11 @@ class Anciennete(Document):
 				FROM `tabAnciennete` a INNER JOIN `tabAnciennete Details` d ON a.name =  d.parent
 				WHERE a.payroll_period = %(payroll_period)s
 			) t ON e.employee = t.employee  AND t.payroll_period = p.name
-			INNER JOIN 	`tabEmployee Category Details` c on e.employee_category_details = c.name
+			INNER JOIN 	`tabEmployee Category Details` c on e.employee_category_details = c.name 
 			WHERE e.status = 'Active' AND e.company = %(company)s AND (e.branch LIKE %(branch)s or e.branch IS NULL ) AND p.name = %(payroll_period)s
 			AND DATE_ADD(e.date_of_joining, INTERVAL (YEAR(CURRENT_DATE()) - YEAR(e.date_of_joining)) YEAR) between p.start_date and p.end_date
 			AND t.employee IS NULL AND (e.employment_type LIKE %(employment_type)s) AND YEAR(e.date_of_joining) < YEAR(CURRENT_DATE())
+			AND (e.disable_seniority = 0 OR e.disable_seniority IS NULL)
 		""",{"company":company, "branch":branch, 'payroll_period': self.payroll_period, 'employment_type': employment_type},
 		as_dict =True,
 		)
@@ -59,4 +69,5 @@ class Anciennete(Document):
 						'new_anciennete': (anciennete + ((e.basic_salary_per_day + anciennete) * rate /100) if not anciennete_en_annee else now_year - join_year),
 					}
 				)
+
 

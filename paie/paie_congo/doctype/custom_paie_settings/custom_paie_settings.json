@@ -15,7 +15,8 @@
   "anciennete_en_annee",
   "multiple_salary_in_period",
   "employee_checking",
-  "bonus_in_separate_slip"
+  "bonus_in_separate_slip",
+  "automatic_seniority"
  ],
  "fields": [
   {
@@ -71,12 +72,18 @@
    "fieldname": "bonus_in_separate_slip",
    "fieldtype": "Check",
    "label": "Yearly Bonus in Separate Slip"
+  },
+  {
+   "default": "0",
+   "fieldname": "automatic_seniority",
+   "fieldtype": "Check",
+   "label": "Automatic Seniority"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-12-02 10:28:49.184573",
+ "modified": "2023-12-02 10:47:34.321752",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Custom Paie Settings",

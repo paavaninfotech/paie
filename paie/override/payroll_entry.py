@@ -34,6 +34,24 @@ from erpnext.loan_management.doctype.process_loan_interest_accrual.process_loan_
 
 class CustomPayrollEntry(PayrollEntry):
 
+    def before_save(self):
+        if frappe.db.get_single_value("Custom Paie Settings", "automatic_seniority"):
+            args = {
+                'doctype': 'Anciennete',
+                'company': self.company,
+                'payroll_period': self.payroll_period,
+                'posting_date': self.posting_date
+            }
+            if self.branch :
+                args.update({ "branch": self.branch })
+            if self.employment_type :
+                args.update({ "employment_type": self.employment_type })
+
+            doc = frappe.get_doc(args)
+            if doc:
+                doc.insert()
+                doc.submit()
+
     def calcul_absence(self,emp):
         holiday = get_holiday_dates_for_employee(emp, self.start_date, self.end_date)
         attendance = frappe.db.count('Attendance', filters=[
@@ -112,7 +130,7 @@ class CustomPayrollEntry(PayrollEntry):
                 #Prime de fin d'année
                 bonus_in_separate_slip = frappe.db.get_single_value('Custom Paie Settings', 'bonus_in_separate_slip')
                 if bonus_in_separate_slip == 1:
-                    if self.end_date.month == 12 :
+                    if getdate(self.end_date).month == 12 :
                         leaves_struc = frappe.db.get_list(doctype="Salary Structure Assignment", fields=["salary_type", "salary_structure"], 
                         filters={"eventual": 1, "employee": emp, "docstatus": 1, 'event_name': 'Prime annuelle'})
                         if len(leaves_struc) > 0: 
