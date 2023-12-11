@@ -15,14 +15,14 @@ class Anciennete(Document):
 			self.get_employee()
 
 	def on_submit(self):
-		args = { "company": self.company, "payroll_period": self.payroll_period, "branch": self.branch if self.branch else ["is", "not set"], "employment_type": self.employment_type if self.employment_type else ["is", "not set"], "docstatus": 1,  }
-		exist = frappe.db.exists("Anciennete", args)
+		#args = { "company": self.company, "payroll_period": self.payroll_period, "branch": self.branch if self.branch else ["is", "not set"], "employment_type": self.employment_type if self.employment_type else ["is", "not set"], "docstatus": 1,  }
+		#exist = frappe.db.exists("Anciennete", args)
 		
-		if not exist :
-			for d in self.anciennete_details:
-				doc = frappe.get_doc("Employee", d.employee)
-				doc.anciennete = d.new_anciennete
-				doc.save()
+		#if not exist :
+		for d in self.anciennete_details:
+			doc = frappe.get_doc("Employee", d.employee)
+			doc.anciennete = d.new_anciennete
+			doc.save()
 
 
 	def get_employee(self):
