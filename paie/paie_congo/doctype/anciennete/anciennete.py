@@ -8,14 +8,14 @@ from frappe.model.document import Document
 class Anciennete(Document):
 	
 	def before_save(self):
-		args = { "company": self.company, "payroll_period": self.payroll_period, "branch": self.branch if self.branch else ["is", "not set"], "employment_type": self.employment_type if self.employment_type else ["is", "not set"],  }
+		args = { "company": self.company, "payroll_period": self.payroll_period, "branch": self.branch if self.branch else ["is", "not set"], "employment_type": self.employment_type if self.employment_type else ["is", "not set"], "docstatus": 1, }
 		exist = frappe.db.exists("Anciennete", args)
 		
 		if not exist :
 			self.get_employee()
 
 	def on_submit(self):
-		args = { "company": self.company, "payroll_period": self.payroll_period, "branch": self.branch if self.branch else ["is", "not set"], "employment_type": self.employment_type if self.employment_type else ["is", "not set"],  }
+		args = { "company": self.company, "payroll_period": self.payroll_period, "branch": self.branch if self.branch else ["is", "not set"], "employment_type": self.employment_type if self.employment_type else ["is", "not set"], "docstatus": 1,  }
 		exist = frappe.db.exists("Anciennete", args)
 		
 		if not exist :
