@@ -96,7 +96,7 @@ class CustomPayrollEntry(PayrollEntry):
             for i in liste:
                 dis = frappe.get_doc("Loan Disbursement",{"against_loan": i.name})
                 if dis:
-                    if i.loan_amount == dis.disbursement_amount:
+                    if i.loan_amount == dis.disbursed_amount:
                         doc = frappe.get_doc({
                             'doctype': 'Loan Disbursement',
                             'disbursement_date': self.end_date,
