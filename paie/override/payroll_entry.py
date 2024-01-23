@@ -95,14 +95,15 @@ class CustomPayrollEntry(PayrollEntry):
             liste = frappe.db.get_list("Loan","name",{"status": "Partially Disbursed"})
             for i in liste:
                 dis = frappe.get_doc("Loan Disbursement",{"against_loan": i.name})
-                if i.loan_amount == dis.disbursement_amount:
-                    doc = frappe.get_doc({
-                        'doctype': 'Loan Disbursement',
-                        'disbursement_date': self.end_date,
-                        'disbursed_amount': 0,
-                        'against_loan': i.name,
-                    })
-                    doc.submit()
+                if dis:
+                    if i.loan_amount == dis.disbursement_amount:
+                        doc = frappe.get_doc({
+                            'doctype': 'Loan Disbursement',
+                            'disbursement_date': self.end_date,
+                            'disbursed_amount': 0,
+                            'against_loan': i.name,
+                        })
+                        doc.submit()
                     
             payroll_entry = frappe.get_doc("Payroll Entry", args.payroll_entry)
             salary_slips_exist_for = self.get_existing_salary_slips(employees, args)

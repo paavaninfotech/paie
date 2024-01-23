@@ -668,7 +668,7 @@
   "label": "Vacation",
   "length": 0,
   "mandatory_depends_on": null,
-  "modified": "2023-11-15 17:13:53.671530",
+  "modified": "2024-01-04 00:35:19.838016",
   "module": "Paie Congo",
   "name": "Employee-vacation",
   "no_copy": 0,
