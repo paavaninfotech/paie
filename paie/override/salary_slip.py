@@ -238,22 +238,20 @@ class CustomSalarySlip(SalarySlip):
 			)
 		self.set_net_total_in_words()
 
-	def calculate_lwp_or_ppl_based_on_leave_application(self, holidays, working_days, relieving_date):
+	def calculate_lwp_or_ppl_based_on_leave_application(self, holidays, working_days_list, relieving_date):
 		lwp = 0
+		leave_type_lwp = []
 		holidays = "','".join(holidays)
 		feries = holidays.split(',')
-		nb = len(feries)
 		daily_wages_fraction_for_half_day = (
 			flt(frappe.db.get_value("Payroll Settings", None, "daily_wages_fraction_for_half_day")) or 0.5
 		)
 
-		#frappe.msgprint(str(working_days))
-		for d in range(len(working_days) + nb):
+		nb_working_days = len(working_days_list)
+		for d in range(nb_working_days + len(feries)):
 			date = add_days(cstr(getdate(self.start_date)), d)
-			leave = get_lwp_or_ppl_for_date(date, self.employee, holidays)
-			#frappe.msgprint(str(d) + " | " + str(date))
-			#if relieving_date and d > relieving_date:
-			#	continue
+			leave = get_lwp_or_ppl_for_date_2(date, self.employee, holidays)
+
 			if leave:
 				equivalent_lwp_count = 0
 				is_half_day_leave = cint(leave[0].is_half_day)
@@ -263,13 +261,77 @@ class CustomSalarySlip(SalarySlip):
 				equivalent_lwp_count = (1 - daily_wages_fraction_for_half_day) if is_half_day_leave else 1
 
 				if is_partially_paid_leave:
-					equivalent_lwp_count *= (
-						fraction_of_daily_salary_per_leave if fraction_of_daily_salary_per_leave else 1
-					)
+					equivalent_lwp_count *= (fraction_of_daily_salary_per_leave if fraction_of_daily_salary_per_leave else 1)
 
 				lwp += equivalent_lwp_count
-				#frappe.msgprint(str(lwp))
+
+				leave_type_lwp.append({
+					"leave_type": leave[0].name,
+					"jour": 1,
+					"fraction": fraction_of_daily_salary_per_leave,
+				})
+
+		occurrence_counts = {}
+		total_conge = 0
+
+		for entry in leave_type_lwp:
+			total_conge = total_conge + 1
+			leave_type = entry['leave_type']
+			if leave_type in occurrence_counts:
+				occurrence_counts[leave_type] += 1
+			else:
+				occurrence_counts[leave_type] = 1
+
+			#frappe.msgprint(str(entry['leave_type']))
+
+		self.conge_pris = []
+		for leave_type, count in occurrence_counts.items():
+			self.append('conge_pris',{
+				'leave_type': leave_type,
+				'jour': count,
+			})
+			#self.append('conge_pris',{
+			#		'leave_type': leave_type,
+			#		'jour': count,
+			#		#'fraction': fraction,
+			#	}
+			#)
+
 		return lwp
+
+
+	#def calculate_lwp_or_ppl_based_on_leave_application(self, holidays, working_days, relieving_date):
+	#	lwp = 0
+	#	holidays = "','".join(holidays)
+	#	feries = holidays.split(',')
+	#	nb = len(feries)
+	#	daily_wages_fraction_for_half_day = (
+	#		flt(frappe.db.get_value("Payroll Settings", None, "daily_wages_fraction_for_half_day")) or 0.5
+	#	)
+
+	#	#frappe.msgprint(str(working_days))
+	#	for d in range(len(working_days) + nb):
+	#		date = add_days(cstr(getdate(self.start_date)), d)
+	#		leave = get_lwp_or_ppl_for_date(date, self.employee, holidays)
+	#		#frappe.msgprint(str(d) + " | " + str(date))
+	#		#if relieving_date and d > relieving_date:
+	#		#	continue
+	#		if leave:
+	#			equivalent_lwp_count = 0
+	#			is_half_day_leave = cint(leave[0].is_half_day)
+	#			is_partially_paid_leave = cint(leave[0].is_ppl)
+	#			fraction_of_daily_salary_per_leave = flt(leave[0].fraction_of_daily_salary_per_leave)
+	#
+	#			equivalent_lwp_count = (1 - daily_wages_fraction_for_half_day) if is_half_day_leave else 1
+
+	#			if is_partially_paid_leave:
+	#				equivalent_lwp_count *= (
+	#					fraction_of_daily_salary_per_leave if fraction_of_daily_salary_per_leave else 1
+	#				)
+
+	#			lwp += equivalent_lwp_count
+	#			#frappe.msgprint(str(lwp))
+	#	return lwp
 
 	def make_loan_repayment_entry(self):
 		payroll_payable_account = get_payroll_payable_account(self.company, self.payroll_entry)
@@ -395,9 +457,9 @@ class CustomSalarySlip(SalarySlip):
 				holidays, working_days_list, relieving_date
 			)
 
-			self.calculate_lwp_or_ppl_based_on_leave_application_2(
-				holidays, working_days_list, relieving_date
-			)
+			#self.calculate_lwp_or_ppl_based_on_leave_application_2(
+			#	holidays, working_days_list, relieving_date
+			#)
 
 		if not lwp:
 			lwp = actual_lwp
@@ -486,6 +548,7 @@ def get_lwp_or_ppl_for_date_2(date, employee, holidays):
 		query = query.where((LeaveType.include_holiday == "1"))
 
 	return query.run(as_dict=True)
+
 
 
 
