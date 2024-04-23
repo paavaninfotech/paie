@@ -297,6 +297,8 @@ class CustomSalarySlip(SalarySlip):
 			#	}
 			#)
 
+		self.total_leaves = lwp
+		
 		return lwp
 
 
