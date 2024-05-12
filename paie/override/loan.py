@@ -4,13 +4,13 @@ import math
 import frappe
 from frappe import _
 from frappe.utils import add_months, flt, get_last_day, getdate, now_datetime, nowdate
-from erpnext.loan_management.doctype.loan.loan import Loan, add_single_month, validate_repayment_method
+from lending.loan_management.doctype.loan.loan import Loan, add_single_month, validate_repayment_method
 
 import erpnext
 from erpnext.accounts.doctype.journal_entry.journal_entry import get_payment_entry
 from erpnext.controllers.accounts_controller import AccountsController
-from erpnext.loan_management.doctype.loan_repayment.loan_repayment import calculate_amounts
-from erpnext.loan_management.doctype.loan_security_unpledge.loan_security_unpledge import (
+from lending.loan_management.doctype.loan_repayment.loan_repayment import calculate_amounts
+from lending.loan_management.doctype.loan_security_unpledge.loan_security_unpledge import (
 	get_pledged_security_qty,
 )
 

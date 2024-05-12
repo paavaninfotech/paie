@@ -1,4 +1,4 @@
-from erpnext.loan_management.doctype.loan_repayment.loan_repayment import LoanRepayment
+from lending.loan_management.doctype.loan_repayment.loan_repayment import LoanRepayment
 import frappe
 from frappe import _
 

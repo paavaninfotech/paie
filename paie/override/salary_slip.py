@@ -13,10 +13,10 @@ from frappe.utils import (
 	money_in_words,
 	rounded,
 )
-from erpnext.loan_management.doctype.process_loan_interest_accrual.process_loan_interest_accrual import (
+from lending.loan_management.doctype.process_loan_interest_accrual.process_loan_interest_accrual import (
 	process_loan_interest_accrual_for_term_loans,
 )
-from erpnext.loan_management.doctype.loan_repayment.loan_repayment import (
+from lending.loan_management.doctype.loan_repayment.loan_repayment import (
 	calculate_amounts,
 	create_repayment_entry,
 )

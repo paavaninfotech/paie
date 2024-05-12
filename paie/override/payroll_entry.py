@@ -30,7 +30,7 @@ from erpnext.accounts.utils import get_fiscal_year
 from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee
 from hrms.hr.utils import get_holiday_dates_for_employee
 from paie.override.journal_entry import CustomJournalEntry
-from erpnext.loan_management.doctype.process_loan_interest_accrual.process_loan_interest_accrual import process_loan_interest_accrual_for_term_loans
+from lending.loan_management.doctype.process_loan_interest_accrual.process_loan_interest_accrual import process_loan_interest_accrual_for_term_loans
 
 class CustomPayrollEntry(PayrollEntry):
 
