@@ -156,10 +156,13 @@ class CustomPayrollEntry(PayrollEntry):
                             WHERE a.pay_period = '%s' AND employee = '%s' AND a.docstatus = 1  
                         """ % (payroll_entry.payroll_period,emp), as_dict = 1
                     )
-                    if multiple_salary_in_period :
+
+                    if multiple_salary_in_period == 1 :
                         exist = frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type, "pay_period": self.payroll_period, "start_date": ["<=", self.start_date], "end_date": [">=", self.start_date]})
                     else:
                         exist = frappe.db.exists("Salary Slip", {"employee": emp, "salary_type": t.salary_type, "pay_period": self.payroll_period})
+
+                    #frappe.throw(str(not exist))
                     if not exist :
                         args.update({
                             "doctype": "Salary Slip", 
