@@ -477,7 +477,7 @@ class CustomSalarySlip(SalarySlip):
 		self.total_working_days = working_days
 
 		payment_days = self.get_payment_days(
-			joining_date, relieving_date, include_holidays_in_total_working_days
+			include_holidays_in_total_working_days
 		)
 
 		if flt(payment_days) > flt(lwp):
