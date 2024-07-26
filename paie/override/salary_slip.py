@@ -1,4 +1,4 @@
-from hrms.payroll.doctype.salary_slip.salary_slip import SalarySlip, get_lwp_or_ppl_for_date
+from hrms.payroll.doctype.salary_slip.salary_slip import SalarySlip
 import frappe
 from frappe import _, msgprint
 from frappe.utils import (
