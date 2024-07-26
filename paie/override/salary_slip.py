@@ -80,13 +80,13 @@ class CustomSalarySlip(SalarySlip):
 				"Employee", self.employee, ("date_of_joining", "relieving_date")
 			)
 
-			self.validate_dates(joining_date, relieving_date)
+			self.validate_dates()
 
 			# getin leave details
 			self.get_working_days_details_2(joining_date, relieving_date)
 			struct = ''
 			if not self.salary_structure : 
-				struct = self.check_sal_struct(joining_date, relieving_date)
+				struct = self.check_sal_struct()
 			else: 
 				struct = self.salary_structure
 
