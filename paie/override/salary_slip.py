@@ -426,7 +426,10 @@ class CustomSalarySlip(SalarySlip):
 		)
 
 		if not (joining_date and relieving_date):
-			joining_date, relieving_date = self.get_joining_and_relieving_dates()
+			#joining_date, relieving_date = self.get_joining_and_relieving_dates()
+			joining_date, relieving_date = frappe.get_cached_value(
+				"Employee", self.employee, ("date_of_joining", "relieving_date")
+			)
 
 		working_days = date_diff(self.end_date, self.start_date) + 1
 		if for_preview:
