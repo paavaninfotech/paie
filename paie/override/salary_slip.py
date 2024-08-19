@@ -416,6 +416,7 @@ class CustomSalarySlip(SalarySlip):
 		
 		self.total_leaves = total_conge
 		#return leave_type_lwp
+		
 
 	def get_working_days_details_2(
 		self, joining_date=None, relieving_date=None, lwp=None, for_preview=0
