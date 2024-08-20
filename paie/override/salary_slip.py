@@ -248,7 +248,6 @@ class CustomSalarySlip(SalarySlip):
 		)
 
 		nb_working_days = len(working_days_list)
-		frappe.throw(str(nb_working_days + len(feries)))
 		for d in range(nb_working_days + len(feries)):
 			date = add_days(cstr(getdate(self.start_date)), d)
 			leave = get_lwp_or_ppl_for_date_2(date, self.employee, holidays)
