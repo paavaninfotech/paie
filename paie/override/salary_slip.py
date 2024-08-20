@@ -443,7 +443,6 @@ class CustomSalarySlip(SalarySlip):
 		if not cint(include_holidays_in_total_working_days):
 			holiday_dates = [str(h) for h in holidays]
 			working_days_list = [i for i in working_days_list if str(i) not in holiday_dates]
-			frappe.throw(str(holiday_dates))
 			working_days -= len(holidays)
 			if working_days < 0:
 				frappe.throw(_("There are more holidays than working days this month."))
