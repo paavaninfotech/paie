@@ -238,7 +238,7 @@ class CustomSalarySlip(SalarySlip):
 			)
 		self.set_net_total_in_words()
 
-	def calculate_lwp_or_ppl_based_on_leave_application(self, holidays, working_days_list, relieving_date):
+	def calculate_lwp_or_ppl_based_on_leave_application_3(self, holidays, working_days_list, relieving_date):
 		lwp = 0
 		leave_type_lwp = []
 		holidays = "','".join(holidays)
@@ -457,7 +457,7 @@ class CustomSalarySlip(SalarySlip):
 			)
 			self.absent_days = absent
 		else:
-			actual_lwp = self.calculate_lwp_or_ppl_based_on_leave_application(
+			actual_lwp = self.calculate_lwp_or_ppl_based_on_leave_application_3(
 				holidays, working_days_list, relieving_date
 			)
 
