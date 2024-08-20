@@ -297,7 +297,7 @@ class CustomSalarySlip(SalarySlip):
 			#	}
 			#)
 
-		frappe.throw(str(lwp))
+		frappe.msgprint(str(lwp))
 		self.total_leaves = lwp
 		
 		return lwp
