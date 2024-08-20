@@ -239,6 +239,7 @@ class CustomSalarySlip(SalarySlip):
 		self.set_net_total_in_words()
 
 	def calculate_lwp_or_ppl_based_on_leave_application(self, holidays, working_days_list, relieving_date):
+		frappe.throw(str(working_days_list))
 		lwp = 0
 		leave_type_lwp = []
 		holidays = "','".join(holidays)
@@ -285,7 +286,6 @@ class CustomSalarySlip(SalarySlip):
 			#frappe.msgprint(str(entry['leave_type']))
 
 		self.conge_pris = []
-		frappe.throw(str(occurrence_counts))
 		for leave_type, count in occurrence_counts.items():
 			self.append('conge_pris',{
 				'leave_type': leave_type,
