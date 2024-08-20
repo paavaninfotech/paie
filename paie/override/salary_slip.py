@@ -285,7 +285,7 @@ class CustomSalarySlip(SalarySlip):
 			#frappe.msgprint(str(entry['leave_type']))
 
 		self.conge_pris = []
-		frappe.throw(occurrence_counts)
+		frappe.throw(str(occurrence_counts))
 		for leave_type, count in occurrence_counts.items():
 			self.append('conge_pris',{
 				'leave_type': leave_type,
