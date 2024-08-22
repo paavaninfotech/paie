@@ -247,6 +247,8 @@ class CustomPayrollEntry(PayrollEntry):
                     "pay_period": self.payroll_period
                 }
             )
+
+            full_enqueue = frappe.db.get_single_value('Custom Paie Settings', 'full_enqueue')
             if not full_enqueue :
                 if len(employees) > 30 or frappe.flags.enqueue_payroll_entry:
                     self.db_set("status", "Queued")
@@ -267,19 +269,20 @@ class CustomPayrollEntry(PayrollEntry):
                     # since this method is called via frm.call this doc needs to be updated manually
                     self.reload()
             else:
-                self.db_set("status", "Queued")
-                frappe.enqueue(
-                    self.create_salary_slips_for_employees,
-                    timeout=3600,
-                    employees=employees,
-                    args=args,
-                    publish_progress=True,
-                )
-                frappe.msgprint(
-                    _("Salary Slip creation is queued. It may take a few minutes"),
-                    alert=True,
-                    indicator="blue",
-                )
+                if len(employees) > 0 or frappe.flags.enqueue_payroll_entry:
+                    self.db_set("status", "Queued")
+                    frappe.enqueue(
+                        self.create_salary_slips_for_employees,
+                        timeout=3600,
+                        employees=employees,
+                        args=args,
+                        publish_progress=True,
+                    )
+                    frappe.msgprint(
+                        _("Salary Slip creation is queued. It may take a few minutes"),
+                        alert=True,
+                        indicator="blue",
+                    )
 
     def log_payroll_failure(self,process, payroll_entry, error):
         error_log = frappe.log_error(
