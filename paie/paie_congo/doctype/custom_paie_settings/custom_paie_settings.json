@@ -16,7 +16,8 @@
   "multiple_salary_in_period",
   "employee_checking",
   "bonus_in_separate_slip",
-  "automatic_seniority"
+  "automatic_seniority",
+  "full_enqueue"
  ],
  "fields": [
   {
@@ -78,12 +79,18 @@
    "fieldname": "automatic_seniority",
    "fieldtype": "Check",
    "label": "Automatic Seniority"
+  },
+  {
+   "default": "0",
+   "fieldname": "full_enqueue",
+   "fieldtype": "Check",
+   "label": "Full Enqueue"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-12-02 10:47:34.321752",
+ "modified": "2024-08-22 15:29:50.166779",
  "modified_by": "Administrator",
  "module": "Paie Congo",
  "name": "Custom Paie Settings",
