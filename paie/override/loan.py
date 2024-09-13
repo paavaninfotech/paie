@@ -4,7 +4,8 @@ import math
 import frappe
 from frappe import _
 from frappe.utils import add_months, flt, get_last_day, getdate, now_datetime, nowdate
-from lending.loan_management.doctype.loan.loan import Loan, add_single_month, validate_repayment_method
+from lending.loan_management.doctype.loan.loan import Loan
+from lending.loan_management.doctype.loan_repayment_schedule.loan_repayment_schedule import add_single_month, validate_repayment_method
 
 import erpnext
 from erpnext.accounts.doctype.journal_entry.journal_entry import get_payment_entry
