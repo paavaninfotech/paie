@@ -5,7 +5,7 @@ import frappe
 from frappe import _
 from frappe.utils import add_months, flt, get_last_day, getdate, now_datetime, nowdate
 from lending.loan_management.doctype.loan.loan import Loan
-from lending.loan_management.doctype.loan_repayment_schedule.loan_repayment_schedule import add_single_month, validate_repayment_method
+from lending.loan_management.doctype.loan_repayment_schedule.loan_repayment_schedule import add_single_month
 
 import erpnext
 from erpnext.accounts.doctype.journal_entry.journal_entry import get_payment_entry
@@ -39,6 +39,16 @@ class CustomLoan(Loan):
 
 		self.calculate_totals()
 	
+	def validate_repayment_method(self):
+		if self.repayment_method == "Repay Over Number of Periods" and not self.repayment_periods:
+			frappe.throw(_("Please enter Repayment Periods"))
+
+		if self.repayment_method == "Repay Fixed Amount per Period":
+			if not self.repayment_amount:
+				frappe.throw(_("Please enter repayment Amount"))
+			if self.repayment_amount > self.loan_amount:
+				frappe.throw(_("Monthly Repayment Amount cannot be greater than Loan Amount"))
+
 	def make_repayment_schedule(self):
 		if not self.repayment_start_date:
 			frappe.throw(_("Repayment Start Date is mandatory for term loans"))
